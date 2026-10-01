@@ -26,7 +26,11 @@ A browser-based cooperative fantasy intrigue RPG for 1–6 players, built on the
 
 ## Scale
 
-The campaign now contains roughly **84 scene definitions**, with many mutually exclusive route scenes. A normal playthrough sees only one part of the total campaign tree unless the party splits.
+The campaign now contains roughly **116 scene definitions**, with many mutually exclusive route scenes. A normal playthrough sees only one part of the total campaign tree unless the party splits.
+
+- **Bespoke Greyhaven artwork.** The old Lost Expedition placeholder scenes have been replaced with city, docks, masquerade, undercity, siege and Gate-of-Kings artwork, plus dedicated recurring-character portraits.
+- **Cinematic landing page.** The home screen now uses a full-height Greyhaven illustration and a simpler, more atmospheric entry into the game.
+- **Cleaner Sense Checks.** Sense Checks now show only the target, relevant skill ratings, and what success or a miss means.
 
 ## Run / deploy
 

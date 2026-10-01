@@ -406,6 +406,178 @@ Object.assign(actionMap,{
   arsenal_hold:{hold:{type:'team',desc:'hold the arsenal entrances until loyal help arrives',memberDifficulty:7,teamSize:3,success:'@merge:coup_fronts:palace_siege',failure:'arsenal',dangerous:true,reason:'Several entrances and the apprentices inside must be defended together.',teamRoles:[{name:'Hold the main doors',skills:['Strength','Endurance']},{name:'Watch the east entrance',skills:['Awareness','Agility']},{name:'Protect the workers',skills:['Influence','Spirit']}],effects:{ally:'arsenal'},failEffects:{threat:1}}}
 });
 
+
+// --- V3 STORY DEPTH PASS: longer route arcs ---
+Object.assign(actionMap,{
+  rooftop_message:{
+    follow:{type:'solo',desc:'follow the rooftop signal chain',difficulty:7,allowedSkills:['Agility','Awareness'],success:'lantern_rope_bridge',failure:'lantern_rope_bridge',dangerous:true},
+    map:{type:'solo',lowStakes:true,desc:'work out where the rooftop signals are heading',difficulty:6,allowedSkills:['Knowledge','Awareness'],success:'lantern_rope_bridge',failure:'lantern_rope_bridge',effects:{flag:'guild_route'},outcomeText:'the signal chain ends beyond the dyers’ quarter rather than at the obvious guild streets'}
+  },
+  lantern_rope_bridge:{
+    cross:{type:'solo',desc:'cross the rope bridge after the messenger',difficulty:6,allowedSkills:['Agility','Endurance'],success:'dye_court',failure:'dye_court'},
+    watch:{type:'solo',lowStakes:true,desc:'watch the far roof before committing',difficulty:6,allowedSkills:['Awareness','Stealth'],success:'dye_court',failure:'dye_court',effects:{flag:'lantern_tail'},outcomeText:'a second watcher is shadowing the messenger from the chimney line'}
+  },
+  dye_court:{
+    read:{type:'solo',lowStakes:true,desc:'read the black-wax marks in the Dyers’ Court',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'old_shrine',failure:'old_shrine',effects:{flag:'fresh_guild_mark'},outcomeText:'which doorway carries the freshest guild mark'},
+    ask:{type:'support',desc:'ask a dyer which stranger passed through',difficulty:6,allowedSkills:['Influence','Spirit'],supportSkills:['Awareness','Knowledge'],success:'old_shrine',failure:'old_shrine'}
+  },
+  old_shrine:{
+    stairs:{type:'instant',desc:'take the hidden stair beside the old shrine',success:'whisper_house'},
+    inspect:{type:'solo',lowStakes:true,desc:'inspect the offerings beneath the defaced crest',difficulty:6,allowedSkills:['Knowledge','Awareness'],success:'whisper_house',failure:'whisper_house',effects:{flag:'old_rebel_crest'},outcomeText:'the crest belongs to a royal branch erased from newer histories'}
+  },
+  whisper_house:{
+    listen:{type:'solo',lowStakes:true,desc:'listen before speaking in the Whisper House',difficulty:6,allowedSkills:['Awareness','Spirit'],success:'guild_stair',failure:'guild_stair',effects:{flag:'rook_under_pressure'},outcomeText:'several customers are quietly asking whether Rook still controls the ward'},
+    trade:{type:'support',desc:'trade a harmless truth for directions to Rook',difficulty:6,allowedSkills:['Influence','Knowledge'],supportSkills:['Spirit','Awareness'],success:'guild_stair',failure:'guild_stair'}
+  },
+  guild_stair:{
+    lose:{type:'solo',desc:'lose the tail through the workshops',difficulty:7,allowedSkills:['Stealth','Agility'],success:'guild_doors',failure:'guild_doors',effects:{flag:'tail_lost'}},
+    face:{type:'support',desc:'turn and confront the follower openly',difficulty:7,allowedSkills:['Influence','Spirit'],supportSkills:['Awareness','Strength'],success:'guild_doors',failure:'guild_doors',effects:{flag:'tail_identified'}}
+  },
+
+  ropewalk:{
+    trail:{type:'support',desc:'recover the cargo trail through the Ropewalk',difficulty:6,allowedSkills:['Awareness','Survival'],supportSkills:['Stealth','Agility'],success:'ropeyard_watch',failure:'ropeyard_watch'},
+    wax:{type:'solo',lowStakes:true,desc:'study the black wax and fresh gate marks',difficulty:6,allowedSkills:['Knowledge','Craft'],success:'ropeyard_watch',failure:'ropeyard_watch',effects:{flag:'black_wax_source'},outcomeText:'the wax matches sealing material used by royal logistics offices'}
+  },
+  ropeyard_watch:{
+    sense:{type:'solo',lowStakes:true,desc:'study the ropeyard before moving on',difficulty:6,allowedSkills:['Awareness','Survival'],success:'chandlers_lane',failure:'chandlers_lane',effects:{flag:'military_disguise'},outcomeText:'one dockworker is wearing military boots and watching the wagon route'},
+    trail:{type:'solo',desc:'follow the fresh wagon ruts',difficulty:6,allowedSkills:['Survival','Awareness'],success:'chandlers_lane',failure:'chandlers_lane'}
+  },
+  chandlers_lane:{
+    buy:{type:'instant',desc:'buy the marked crate wood and ask where it came from',success:'night_ferry',effects:{flag:'royal_crate_mark'}},
+    trace:{type:'solo',lowStakes:true,desc:'reconstruct the damaged royal inventory mark',difficulty:6,allowedSkills:['Knowledge','Craft'],success:'night_ferry',failure:'night_ferry',effects:{flag:'royal_crate_mark'},outcomeText:'the broken mark came from a Crown armoury shipment that should never have reached the docks'}
+  },
+  night_ferry:{
+    cross:{type:'solo',desc:'take the night ferry quietly',difficulty:6,allowedSkills:['Stealth','Spirit'],success:'customs_tunnel',failure:'customs_tunnel'},
+    watch:{type:'solo',lowStakes:true,desc:'watch the men waiting across the canal',difficulty:6,allowedSkills:['Awareness','Influence'],success:'customs_tunnel',failure:'customs_tunnel',effects:{flag:'dock_receiver'},outcomeText:'the waiting men are not smugglers; one carries a military dispatch case'}
+  },
+  customs_tunnel:{
+    enter:{type:'instant',desc:'follow the abandoned customs tunnel',success:'warehouse_roof'},
+    inspect:{type:'solo',lowStakes:true,desc:'inspect the drag marks and wall hooks',difficulty:6,allowedSkills:['Craft','Awareness'],success:'warehouse_roof',failure:'warehouse_roof',effects:{flag:'heavy_weapons'},outcomeText:'the cargo was far heavier than ordinary contraband and moved with organised equipment'}
+  },
+  warehouse_roof:{
+    climb:{type:'solo',desc:'climb the warehouse roof for a better view',difficulty:7,allowedSkills:['Agility','Endurance'],success:'warehouse_watch',failure:'warehouse_watch',dangerous:true},
+    wait:{type:'solo',lowStakes:true,desc:'watch the warehouse yard from below',difficulty:6,allowedSkills:['Stealth','Awareness'],success:'warehouse_watch',failure:'warehouse_watch',effects:{flag:'warehouse_shift'},outcomeText:'the guards change on a military-style rotation rather than a smuggler’s watch'}
+  },
+
+  music_room:{
+    search:{type:'solo',lowStakes:true,desc:'search the empty music room without disturbing it',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'portrait_corridor',failure:'portrait_corridor',effects:{flag:'altered_seating'},outcomeText:'the seating plan was altered to move the Prince closer to a side door'},
+    door:{type:'instant',desc:'follow the boot prints through the servant door',success:'portrait_corridor'}
+  },
+  portrait_corridor:{
+    listen:{type:'solo',lowStakes:true,desc:'listen to the officers beneath the royal portraits',difficulty:6,allowedSkills:['Awareness','Spirit'],success:'card_room',failure:'card_room',effects:{flag:'officer_route'},outcomeText:'the officers are discussing the Prince’s route rather than the celebration'},
+    pass:{type:'solo',desc:'pass the officers without drawing notice',difficulty:6,allowedSkills:['Influence','Stealth'],success:'card_room',failure:'card_room'}
+  },
+  card_room:{
+    observe:{type:'solo',lowStakes:true,desc:'watch the card table for signals',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'moon_balcony',failure:'moon_balcony',effects:{flag:'black_ring'},outcomeText:'the man with the black ring is receiving signals whenever palace doors open'},
+    join:{type:'support',desc:'join one hand of cards to get closer',difficulty:7,allowedSkills:['Influence','Spirit'],supportSkills:['Awareness','Knowledge'],success:'moon_balcony',failure:'moon_balcony'}
+  },
+  moon_balcony:{
+    follow:{type:'solo',desc:'shadow the servant carrying the folded note',difficulty:7,allowedSkills:['Stealth','Agility'],success:'chapel_antechamber',failure:'chapel_antechamber'},
+    read:{type:'solo',lowStakes:true,desc:'read the exchange from across the balcony',difficulty:6,allowedSkills:['Awareness','Influence'],success:'chapel_antechamber',failure:'chapel_antechamber',effects:{flag:'royal_gallery_target'},outcomeText:'the servant was directed toward the Royal Gallery just before the Prince arrives'}
+  },
+  chapel_antechamber:{
+    help:{type:'support',desc:'open the locked chapel side door',difficulty:6,allowedSkills:['Craft','Strength'],supportSkills:['Knowledge','Endurance'],success:'balcony_watch',failure:'balcony_watch'},
+    question:{type:'solo',lowStakes:true,desc:'find out why the chapel door was locked',difficulty:6,allowedSkills:['Influence','Knowledge'],success:'balcony_watch',failure:'balcony_watch',effects:{flag:'palace_lock_changed'},outcomeText:'the lock was changed that afternoon on an order carrying Corvin’s office seal'}
+  },
+
+  linen_stairs:{
+    listen:{type:'solo',lowStakes:true,desc:'listen to the guard-roster conversation above',difficulty:6,allowedSkills:['Awareness','Spirit'],success:'pantry_crossing',failure:'pantry_crossing',effects:{flag:'guard_roster_changed'},outcomeText:'the Prince’s usual guards were reassigned for tonight only'},
+    climb:{type:'solo',desc:'climb before the speakers leave the landing',difficulty:7,allowedSkills:['Agility','Stealth'],success:'pantry_crossing',failure:'pantry_crossing'}
+  },
+  pantry_crossing:{
+    blend:{type:'solo',desc:'blend into the servants crossing the lower pantry',difficulty:6,allowedSkills:['Stealth','Influence'],success:'furnace_room',failure:'furnace_room'},
+    read:{type:'solo',lowStakes:true,desc:'read the steward before approaching',difficulty:6,allowedSkills:['Awareness','Spirit'],success:'furnace_room',failure:'furnace_room',effects:{flag:'steward_nervous'},outcomeText:'the steward is checking names because someone important has already entered using a false servant identity'}
+  },
+  furnace_room:{
+    hatch:{type:'support',desc:'open the maintenance hatch beside the furnaces',difficulty:6,allowedSkills:['Craft','Knowledge'],supportSkills:['Strength','Awareness'],success:'laundry_court',failure:'laundry_court'},
+    marks:{type:'solo',lowStakes:true,desc:'study the chalk arrows beside the hatch',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'laundry_court',failure:'laundry_court',effects:{flag:'messenger_marks'},outcomeText:'the arrows form a messenger shorthand pointing toward the royal apartments'}
+  },
+  laundry_court:{
+    cross:{type:'solo',desc:'cross behind the hanging linen',difficulty:7,allowedSkills:['Stealth','Agility'],success:'page_passage',failure:'page_passage'},
+    intervene:{type:'support',desc:'distract the guards searching the kitchen boy',difficulty:6,allowedSkills:['Influence','Spirit'],supportSkills:['Awareness','Stealth'],success:'page_passage',failure:'page_passage',effects:{ally:'palace_servants'}}
+  },
+  page_passage:{
+    trust:{type:'instant',desc:'let the frightened page guide you',success:'servant_archive',effects:{ally:'page'}},
+    verify:{type:'solo',lowStakes:true,desc:'check the page’s story before following',difficulty:6,allowedSkills:['Awareness','Spirit'],success:'servant_archive',failure:'servant_archive',effects:{flag:'royal_messenger_route'},outcomeText:'his description matches a sealed royal messenger passage omitted from public palace plans'}
+  },
+
+  old_belfry:{
+    climb:{type:'support',desc:'climb the abandoned belfry safely',difficulty:6,allowedSkills:['Agility','Endurance'],supportSkills:['Craft','Awareness'],success:'bell_loft',failure:'bell_loft'},
+    map:{type:'solo',lowStakes:true,desc:'map the old city foundations from the belfry',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'bell_loft',failure:'bell_loft',effects:{flag:'gate_location'},outcomeText:'a ring of foundations surrounds the buried Gate district'}
+  },
+  bell_loft:{
+    climb:{type:'solo',desc:'climb the bell loft toward the roof',difficulty:6,allowedSkills:['Agility','Endurance'],success:'tiled_roofs',failure:'tiled_roofs'},
+    rope:{type:'solo',lowStakes:true,desc:'inspect the freshly cut bell rope',difficulty:6,allowedSkills:['Craft','Awareness'],success:'tiled_roofs',failure:'tiled_roofs',effects:{flag:'bell_sabotage'},outcomeText:'the rope was cut from above, recently, with a military utility blade'}
+  },
+  tiled_roofs:{
+    cross:{type:'support',desc:'cross the rain-slick Bell Quarter roofs',difficulty:7,allowedSkills:['Agility','Endurance'],supportSkills:['Craft','Awareness'],success:'observatory',failure:'observatory',dangerous:true},
+    route:{type:'solo',lowStakes:true,desc:'find the safest line across the rooftops',difficulty:6,allowedSkills:['Awareness','Craft'],success:'observatory',failure:'observatory',effects:{flag:'safe_roofline'},outcomeText:'an old maintenance walkway avoids the steepest tiled roofs'}
+  },
+  observatory:{
+    study:{type:'solo',lowStakes:true,desc:'study the altered instrument in the observatory',difficulty:6,allowedSkills:['Knowledge','Awareness'],success:'rain_gallery',failure:'rain_gallery',effects:{flag:'western_army_seen'},outcomeText:'the instrument was moved to monitor the western road where Corvin’s hidden troops are gathering'},
+    rest:{type:'instant',desc:'shelter briefly beneath the observatory dome',success:'rain_gallery'}
+  },
+  rain_gallery:{
+    wait:{type:'solo',lowStakes:true,desc:'identify the voices approaching the rain gallery',difficulty:6,allowedSkills:['Awareness','Spirit'],success:'roof_bridge',failure:'roof_bridge',effects:{flag:'tower_patrol_known'},outcomeText:'the voices belong to civic guards, not Corvin’s soldiers'},
+    move:{type:'solo',desc:'cross the gallery before the patrol arrives',difficulty:7,allowedSkills:['Agility','Stealth'],success:'roof_bridge',failure:'roof_bridge'}
+  },
+
+  cistern:{
+    soot:{type:'solo',lowStakes:true,desc:'study lantern soot and footprints in the Great Cistern',difficulty:6,allowedSkills:['Awareness','Survival'],success:'drain_lock',failure:'drain_lock',effects:{flag:'chapel_route'},outcomeText:'the freshest traffic goes toward a drainage lock rather than the obvious chapel route'},
+    echo:{type:'solo',desc:'use echoes to identify the largest passage',difficulty:6,allowedSkills:['Knowledge','Awareness'],success:'drain_lock',failure:'drain_lock'}
+  },
+  drain_lock:{
+    open:{type:'support',desc:'work the rusted drain lock',difficulty:7,allowedSkills:['Craft','Strength'],supportSkills:['Knowledge','Endurance'],success:'drowned_street',failure:'drowned_street'},
+    scratches:{type:'solo',lowStakes:true,desc:'read the fresh damage on the lock wheel',difficulty:6,allowedSkills:['Craft','Awareness'],success:'drowned_street',failure:'drowned_street',effects:{flag:'recent_undercity_party'},outcomeText:'someone forced the gate from the city side only hours ago'}
+  },
+  drowned_street:{
+    follow:{type:'solo',desc:'follow the moving light through the drowned street',difficulty:7,allowedSkills:['Awareness','Stealth'],success:'salt_vault',failure:'salt_vault'},
+    road:{type:'instant',desc:'stay on the drowned road',success:'salt_vault'}
+  },
+  salt_vault:{
+    search:{type:'solo',lowStakes:true,desc:'search the recent camp in the salt vault',difficulty:6,allowedSkills:['Awareness','Survival'],success:'whisper_culvert',failure:'whisper_culvert',effects:{flag:'soldier_camp_below'},outcomeText:'the camp belonged to trained soldiers moving through the undercity, not ordinary smugglers'},
+    pass:{type:'instant',desc:'leave the camp undisturbed',success:'whisper_culvert'}
+  },
+  whisper_culvert:{
+    marks:{type:'solo',lowStakes:true,desc:'read the partly submerged smuggler marks',difficulty:6,allowedSkills:['Knowledge','Awareness'],success:'smuggler_chapel',failure:'smuggler_chapel',effects:{flag:'safe_culvert'},outcomeText:'one culvert is marked as a safe route toward the buried royal works'},
+    air:{type:'solo',desc:'follow the strongest current of fresh air',difficulty:6,allowedSkills:['Survival','Spirit'],success:'smuggler_chapel',failure:'smuggler_chapel'}
+  },
+
+  gate_tower:{
+    stop:{type:'team',desc:'stop the West Gate windlass before the doors open',memberDifficulty:7,teamSize:3,success:'wall_walk',failure:'wall_walk',dangerous:true,reason:'Machinery, attackers and the damaged lock all need attention.',teamRoles:[{name:'Control the windlass',skills:['Strength','Craft']},{name:'Repair the lock',skills:['Craft','Knowledge']},{name:'Hold the stair',skills:['Agility','Endurance']}],effects:{flag:'west_gate_closed'}},
+    sense:{type:'solo',lowStakes:true,desc:'identify who is actually commanding the gate tower',difficulty:6,allowedSkills:['Awareness','Influence'],success:'wall_walk',failure:'wall_walk',effects:{flag:'gate_traitor_known'},outcomeText:'the officer directing the tower is giving orders from behind the fighting'}
+  },
+  wall_walk:{
+    hold:{type:'team',desc:'hold the West Wall walk while the Watch regroups',memberDifficulty:7,teamSize:3,success:'chain_room',failure:'chain_room',dangerous:true,teamRoles:[{name:'Hold the stairhead',skills:['Strength','Endurance']},{name:'Watch the parapet',skills:['Awareness','Agility']},{name:'Keep the Watch moving',skills:['Influence','Spirit']}]},
+    route:{type:'solo',lowStakes:true,desc:'find the fastest route to the chain room',difficulty:6,allowedSkills:['Awareness','Craft'],success:'chain_room',failure:'chain_room',effects:{flag:'gate_shortcut'},outcomeText:'a maintenance stair bypasses the exposed lower landing'}
+  },
+  chain_room:{
+    repair:{type:'support',desc:'repair the sabotaged gate chain',difficulty:7,allowedSkills:['Craft','Strength'],supportSkills:['Knowledge','Endurance'],success:'outer_yard',failure:'outer_yard'},
+    inspect:{type:'solo',lowStakes:true,desc:'find any other tampering in the chain room',difficulty:6,allowedSkills:['Craft','Knowledge'],success:'outer_yard',failure:'outer_yard',effects:{flag:'gate_second_sabotage'},outcomeText:'a second wedge was hidden beneath the counterweight brake'}
+  },
+  outer_yard:{
+    prepare:{type:'team',desc:'prepare the outer yard for Corvin’s second wave',memberDifficulty:6,teamSize:3,success:'gate_counterattack',failure:'gate_counterattack',teamRoles:[{name:'Set the barricade',skills:['Strength','Craft']},{name:'Choose firing lanes',skills:['Awareness','Knowledge']},{name:'Rally the wounded',skills:['Influence','Spirit']}]},
+    listen:{type:'solo',lowStakes:true,desc:'locate the approaching horns',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'gate_counterattack',failure:'gate_counterattack',effects:{flag:'counterattack_flank'},outcomeText:'the second wave is massing on the river-side stair rather than the main road'}
+  },
+
+  powder_room:{
+    save:{type:'team',desc:'contain the fire in the arsenal powder room',memberDifficulty:7,teamSize:3,success:'forge_floor',failure:'forge_floor',dangerous:true,reason:'Water, powder barrels and panicked workers must all be managed at once.',teamRoles:[{name:'Smother the flame',skills:['Craft','Endurance']},{name:'Move the barrels',skills:['Strength','Agility']},{name:'Direct the workers',skills:['Influence','Awareness']}],effects:{ally:'arsenal'}},
+    sense:{type:'solo',lowStakes:true,desc:'work out who started the powder-room fire',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'forge_floor',failure:'forge_floor',effects:{flag:'arsenal_saboteur'},outcomeText:'the fire was deliberately started from inside the arsenal'}
+  },
+  forge_floor:{
+    organise:{type:'support',desc:'organise the forge workers and secure the floor',difficulty:6,allowedSkills:['Influence','Craft'],supportSkills:['Spirit','Awareness'],success:'cart_shed',failure:'cart_shed'},
+    sense:{type:'solo',lowStakes:true,desc:'find the safest defensive position on the forge floor',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'cart_shed',failure:'cart_shed',effects:{flag:'forge_position'},outcomeText:'the raised quenching platform controls both side entrances'}
+  },
+  cart_shed:{
+    lane:{type:'solo',desc:'scout the narrow service lane behind the cart shed',difficulty:7,allowedSkills:['Stealth','Awareness'],success:'armoury_gallery',failure:'armoury_gallery'},
+    move:{type:'team',desc:'move the ammunition carts across the exposed yard',memberDifficulty:6,teamSize:3,success:'armoury_gallery',failure:'armoury_gallery',teamRoles:[{name:'Move the first cart',skills:['Strength','Endurance']},{name:'Watch the yard',skills:['Awareness','Agility']},{name:'Clear the route',skills:['Craft','Influence']}]}
+  },
+  armoury_gallery:{
+    defend:{type:'team',desc:'prepare the Armoury Gallery for the final assault',memberDifficulty:7,teamSize:3,success:'arsenal_hold',failure:'arsenal_hold',dangerous:true,teamRoles:[{name:'Hold the gallery stairs',skills:['Strength','Endurance']},{name:'Cover the doors below',skills:['Awareness','Agility']},{name:'Keep the defenders steady',skills:['Influence','Spirit']}]},
+    weak:{type:'solo',lowStakes:true,desc:'identify the attackers’ weakest approach',difficulty:6,allowedSkills:['Awareness','Knowledge'],success:'arsenal_hold',failure:'arsenal_hold',effects:{flag:'arsenal_weak_flank'},outcomeText:'the eastern stair is thinly held because Corvin expects the main defence at the doors'}
+  }
+});
+
 actionMap.watch_house={crossroads:{type:'instant',desc:'take the investigation into Greyhaven',success:'city_crossroads'}};
 actionMap.palace_audience={routes:{type:'instant',desc:'choose how to move through Royal Hill',success:'palace_route_choice'}};
 actionMap.border_news={routes:{type:'instant',desc:'choose a route into Old Greyhaven',success:'old_city_choice'}};
@@ -456,4 +628,4 @@ io.on('connection', socket => {
   socket.on('disconnect',()=>{const room=rooms.get(socket.data.roomCode);if(!room)return;const p=socketPlayer(room,socket);if(p&&p.socketId===socket.id){p.connected=false;p.socketId=null;}emitRoom(room);if(!room.players.some(x=>x.connected))setTimeout(()=>{if(rooms.get(room.code)===room&&!room.players.some(x=>x.connected))rooms.delete(room.code);},4*60*60*1000);});
 });
 
-server.listen(PORT, () => console.log(`Lost Expedition RPG listening on ${PORT}`));
+server.listen(PORT, () => console.log(`Black Seal RPG listening on ${PORT}`));
