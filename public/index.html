@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#111827">
-  <title>The Black Seal</title>
+  <title>The Lost Expedition</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,12 +14,12 @@
       <div class="hero-banner__overlay"></div>
       <div class="hero-banner__content hero-banner__content--wide">
         <div class="eyebrow">CO-OPERATIVE FANTASY RPG · 1–6 PLAYERS</div>
-        <h1>The Black Seal</h1>
-        <p class="hero-tagline">Every city has doors that should stay closed.</p>
-        <p class="hero-subtitle">A royal seal is stolen on the eve of a coronation. Build your heroes, follow the conspiracy through court and underworld, and decide who will control the kingdom’s oldest secret.</p>
+        <h1>The Lost Expedition</h1>
+        <p class="hero-tagline">Some places are lost for a reason.</p>
+        <p class="hero-subtitle">Stranded on a forgotten continent, your company must build heroes, make choices together, roll the dice, and live with what happens next.</p>
         <div class="hero-banner__actions">
-          <button id="createAdventureCta" class="btn btn-primary btn-large">Enter Greyhaven</button>
-          <button id="joinAdventureCta" class="btn btn-secondary-accent btn-large">Join a Company</button>
+          <button id="createAdventureCta" class="btn btn-primary btn-large">Begin Expedition</button>
+          <button id="joinAdventureCta" class="btn btn-secondary-accent btn-large">Join Expedition</button>
         </div>
         <div class="hero-banner__microcopy">No Game Master needed · Browser based · Save and return anytime</div>
       </div>
@@ -45,7 +45,7 @@
     <section class="panel home-classes-strip">
       <div class="home-classes-strip__intro">
         <div class="eyebrow">THE COMPANY</div>
-        <h2>Six hero paths. One shared conspiracy.</h2>
+        <h2>Six hero paths. One shared expedition.</h2>
         <p class="muted">Each player creates one hero, chooses a background, allocates skills and grows stronger as the story unfolds.</p>
       </div>
       <div class="class-icon-grid">
@@ -63,7 +63,7 @@
         <div>
           <div class="eyebrow">START THE ADVENTURE</div>
           <h2 id="homeFlowTitle">Create or join your company</h2>
-          <p id="homeFlowText" class="muted">Choose how you want to enter Greyhaven.</p>
+          <p id="homeFlowText" class="muted">Choose how you want to enter the world of Aranor.</p>
         </div>
         <button id="homeFlowBack" class="btn btn-ghost btn-small" type="button">← Back</button>
       </div>
@@ -76,7 +76,7 @@
         <section id="createPanel" class="home-form-panel">
           <div class="step-number">1</div>
           <h3>Create an Adventure</h3>
-          <p class="muted">Begin a new campaign, create your hero, and send the five-letter room code to your friends.</p>
+          <p class="muted">Begin a new expedition, create your own hero, and send the five-letter room code to your friends.</p>
           <div class="form-grid">
             <label>Hero name<input id="createName" maxlength="18" autocomplete="off" placeholder="Enter your hero's name"></label>
             <label>Background<select id="createBackground"></select></label>
@@ -196,7 +196,7 @@
   <section id="game" class="screen hidden">
     <header class="topbar game-topbar">
       <button class="btn btn-ghost btn-small menuBtn" type="button">← Main Menu</button>
-      <div><div class="eyebrow">THE BLACK SEAL</div><h1 id="sceneTitle">Greyhaven</h1></div>
+      <div><div class="eyebrow">THE LOST EXPEDITION</div><h1 id="sceneTitle">The Resolute</h1></div>
       <div class="game-status">
         <div class="sound-row"><button id="heroSheetBtn" class="btn btn-secondary-accent btn-small" type="button">🧭 My Hero</button> <button id="journalBtn" class="btn btn-ghost btn-small" type="button">📖 Journal</button> <button id="recapBtn" class="btn btn-ghost btn-small" type="button">↺ Recap</button> <button id="soundToggle" class="btn btn-ghost btn-small" type="button">🔊 SFX on</button> <button id="ambientToggle" class="btn btn-ghost btn-small" type="button">🌿 Ambience on</button></div>
         <div class="room-mini">Room <strong id="gameRoom"></strong> · Your Return PIN <strong id="returnPinGame">----</strong></div>
@@ -206,7 +206,8 @@
 
     <div class="game-grid">
       <section class="panel story-panel">
-        <div id="sceneArt" class="scene-art" role="img" aria-label="Story scene illustration"><div class="scene-art__icon"></div><div class="scene-art__caption"></div></div><div id="storyBridge" class="story-bridge hidden"></div><div id="sceneKindBadge" class="scene-kind"></div><div id="passiveInsight" class="passive-insight hidden"></div><div id="itemCallback" class="item-callback hidden"></div><div id="battleState" class="battle-state hidden"></div><div id="npcMoment" class="npc-moment hidden"></div><div id="callbackPanel" class="callback-panel hidden"></div>
+        <div id="sceneArt" class="scene-art" role="img" aria-label="Story scene illustration"><div class="scene-art__icon"></div><div class="scene-art__caption"></div></div><div id="sceneKindBadge" class="scene-kind"></div><div id="passiveInsight" class="passive-insight hidden"></div><div id="itemCallback" class="item-callback hidden"></div><div id="battleState" class="battle-state hidden"></div><div id="npcMoment" class="npc-moment hidden"></div><div id="callbackPanel" class="callback-panel hidden"></div>
+        <div id="storyBridge" class="story-bridge hidden"></div>
         <div id="sceneText" class="story"></div>
         <div id="turnNotice" class="turn-notice"></div>
         <div id="choices" class="choice-list"></div>
@@ -215,11 +216,12 @@
         <div id="secret" class="secret hidden"></div>
       </section>
 
-      <aside class="sidebar"><section class="panel voice-panel"><div class="section-heading"><div><div class="eyebrow">OPTIONAL</div><h2>🎙 Voice Chat</h2></div><span id="voiceGameStatus" class="small muted">Not connected</span></div><div class="voice-controls"><button class="btn btn-secondary-accent btn-small voiceJoinBtn" type="button">Join Voice</button><button class="btn btn-ghost btn-small voiceMuteBtn hidden" type="button">Mute</button><button class="btn btn-ghost btn-small voiceLeaveBtn hidden" type="button">Leave</button></div><div id="voiceGameList" class="voice-list small"></div><p class="small muted voice-note">Voice is optional. Ambience lowers automatically while anyone is speaking.</p></section>
+      <aside class="sidebar">
+        <section class="panel voice-panel"><div class="section-heading"><div><div class="eyebrow">OPTIONAL</div><h2>🎙 Voice Chat</h2></div><span id="voiceGameStatus" class="small muted">Not connected</span></div><div class="voice-controls"><button class="btn btn-secondary-accent btn-small voiceJoinBtn" type="button">Join Voice</button><button class="btn btn-ghost btn-small voiceMuteBtn hidden" type="button">Mute</button><button class="btn btn-ghost btn-small voiceLeaveBtn hidden" type="button">Leave</button></div><div id="voiceGameList" class="voice-list small"></div><p class="small muted voice-note">Voice is optional and separate from game sounds.</p></section>
         <section class="panel"><div class="section-heading"><div><div class="eyebrow">PARTY</div><h2>Company</h2></div></div><div id="party" class="player-list"></div></section>
         <section class="panel mission-card"><div class="eyebrow">CURRENT MISSION</div><h2>Objective</h2><p id="mission"></p><div class="resource-row"><span>🎒 Supplies <b id="supplies"></b></span><span>🜂 Relics <b id="relics"></b></span></div><div id="pressureNote" class="pressure-note low"></div></section>
         <section class="panel inventory-card"><div class="eyebrow">EXPEDITION PACK</div><h2>Special Items</h2><div id="inventory" class="inventory-list"></div></section>
-        <section class="panel journey-card"><div class="eyebrow">JOURNEY SO FAR</div><h2>Map of Greyhaven</h2><div id="journey" class="journey-list"></div></section>
+        <section class="panel journey-card"><div class="eyebrow">JOURNEY SO FAR</div><h2>Map of Aranor</h2><div id="journey" class="journey-list"></div></section>
 
         <section id="hostTools" class="panel host-tools hidden">
           <div class="eyebrow">HOST TOOLS</div>
@@ -243,8 +245,8 @@
   <section id="ended" class="screen hidden">
     <div class="panel ending-panel"><button class="btn btn-ghost btn-small menuBtn" type="button">← Main Menu</button>
       <div class="eyebrow">CAMPAIGN COMPLETE</div>
-      <h1>Dawn Over Greyhaven</h1>
-      <div id="endingArt" class="scene-art ending-art"><div class="scene-art__icon">🏰</div><div class="scene-art__caption">Greyhaven after the night of the coup</div></div>
+      <h1>The Island That Should Not Exist</h1>
+      <div id="endingArt" class="scene-art ending-art"><div class="scene-art__icon">🏰</div><div class="scene-art__caption">The ruined city beneath the mountain</div></div>
       <div id="endingText" class="story"></div>
       <div class="next-session"><div class="eyebrow">NEXT SESSION</div><h2>Into the Green Ruins</h2><p>Find the missing survivors, discover who lit the beacon, and learn why a ruined city carries the crest of a kingdom destroyed eight centuries ago.</p></div>
     </div>
@@ -258,14 +260,14 @@
 </div>
 <div id="sceneReveal" class="scene-reveal hidden" aria-live="polite">
   <div class="scene-reveal__content">
-    <div id="revealKicker" class="eyebrow">THE BLACK SEAL</div>
+    <div id="revealKicker" class="eyebrow">THE LOST EXPEDITION</div>
     <h2 id="revealTitle">The Sky Breaks</h2>
     <p id="revealText"></p>
   </div>
 </div>
 
 <div id="journalModal" class="hero-sheet-modal hidden" role="dialog" aria-modal="true" aria-labelledby="journalTitle"><div class="hero-sheet-card journal-card"><div class="hero-sheet-head"><div><div class="eyebrow">CAMPAIGN JOURNAL</div><h2 id="journalTitle">People, clues & decisions</h2></div><button id="journalClose" class="btn btn-ghost btn-small" type="button">Close</button></div><div id="journalBody"></div></div></div>
-<div id="recapModal" class="hero-sheet-modal hidden" role="dialog" aria-modal="true"><div class="hero-sheet-card journal-card"><div class="hero-sheet-head"><div><div class="eyebrow">STORY SO FAR</div><h2>Greyhaven recap</h2></div><button id="recapClose" class="btn btn-ghost btn-small" type="button">Close</button></div><div id="recapBody"></div></div></div>
+<div id="recapModal" class="hero-sheet-modal hidden" role="dialog" aria-modal="true"><div class="hero-sheet-card journal-card"><div class="hero-sheet-head"><div><div class="eyebrow">STORY SO FAR</div><h2>Expedition recap</h2></div><button id="recapClose" class="btn btn-ghost btn-small" type="button">Close</button></div><div id="recapBody"></div></div></div>
 <div id="outcomeModal" class="outcome-modal hidden" role="dialog" aria-modal="true" aria-labelledby="outcomeTitle">
   <div class="outcome-card">
     <div id="outcomeLabel" class="eyebrow">OUTCOME</div>
