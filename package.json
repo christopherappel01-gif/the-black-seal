@@ -1,6 +1,6 @@
 {
   "name": "black-seal-rpg",
-  "version": "4.0.0",
+  "version": "5.0.1",
   "private": true,
   "description": "Greyhaven cooperative intrigue RPG with route arcs, split parties and fog-of-war city exploration",
   "main": "server.js",

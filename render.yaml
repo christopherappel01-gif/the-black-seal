@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: lost-expedition-rpg
+    name: black-seal-rpg
     runtime: node
     plan: free
     buildCommand: npm install
