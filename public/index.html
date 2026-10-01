@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>The Black Seal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="app">
+  <section id="home" class="screen home-screen">
+    <div class="hero-banner hero-banner--opening">
+      <div class="hero-banner__overlay"></div>
+      <div class="hero-banner__content hero-banner__content--wide">
+        <div class="eyebrow">CO-OPERATIVE FANTASY RPG · 1–6 PLAYERS</div>
+        <h1>The Black Seal</h1>
+        <p class="hero-tagline">Every city has doors that should stay closed.</p>
+        <p class="hero-subtitle">A royal seal is stolen on the eve of a coronation. Build your heroes, follow the conspiracy through court and underworld, and decide who will control the kingdom’s oldest secret.</p>
+        <div class="hero-banner__actions">
+          <button id="createAdventureCta" class="btn btn-primary btn-large">Create Adventure</button>
+          <button id="joinAdventureCta" class="btn btn-secondary-accent btn-large">Join Adventure</button>
+        </div>
+        <div class="hero-banner__microcopy">No Game Master needed · Browser based · Save and return anytime</div>
+      </div>
+      <div class="hero-preview-strip">
+        <div class="hero-preview-card">
+          <div class="eyebrow">YOUR HERO</div>
+          <h3>Choose a Class</h3>
+          <p>Knight, Ranger, Thief, Mage, Monk or Engineer — each with their own strengths, growth and spotlight moments.</p>
+        </div>
+        <div class="hero-preview-card">
+          <div class="eyebrow">YOUR CHOICES</div>
+          <h3>The Story Remembers</h3>
+          <p>Failures create new routes. Allies, items and decisions can matter hours later in the campaign.</p>
+        </div>
+        <div class="hero-preview-card">
+          <div class="eyebrow">YOUR PARTY</div>
+          <h3>Play Together</h3>
+          <p>Join from phones or laptops and solve crises no hero could face alone.</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel home-classes-strip">
+      <div class="home-classes-strip__intro">
+        <div class="eyebrow">THE COMPANY</div>
+        <h2>Six hero paths. One shared expedition.</h2>
+        <p class="muted">Each player creates one hero, chooses a background, allocates skills and grows stronger as the story unfolds.</p>
+      </div>
+      <div class="class-icon-grid">
+        <div class="class-icon-card"><span>⚔️</span><b>Knight</b><small>Guardian and frontline defender</small></div>
+        <div class="class-icon-card"><span>🏹</span><b>Ranger</b><small>Tracker, scout and survivor</small></div>
+        <div class="class-icon-card"><span>🗡️</span><b>Thief</b><small>Stealth, traps and infiltration</small></div>
+        <div class="class-icon-card"><span>✨</span><b>Mage</b><small>Magic, lore and insight</small></div>
+        <div class="class-icon-card"><span>🕯️</span><b>Monk</b><small>Healing, spirit and resolve</small></div>
+        <div class="class-icon-card"><span>⚙️</span><b>Engineer</b><small>Repairs, devices and clever fixes</small></div>
+      </div>
+    </section>
+
+    <section id="homeFlow" class="panel home-flow hidden">
+      <div class="home-flow__head">
+        <div>
+          <div class="eyebrow">START THE ADVENTURE</div>
+          <h2 id="homeFlowTitle">Create or join your company</h2>
+          <p id="homeFlowText" class="muted">Choose how you want to enter the world of Aranor.</p>
+        </div>
+        <button id="homeFlowBack" class="btn btn-ghost btn-small" type="button">← Back</button>
+      </div>
+      <div class="home-flow__tabs">
+        <button id="showCreateTab" class="btn btn-ghost btn-small active" type="button">Create</button>
+        <button id="showJoinTab" class="btn btn-ghost btn-small" type="button">Join</button>
+        <button id="showReturnTab" class="btn btn-ghost btn-small" type="button">Return</button>
+      </div>
+      <div class="home-form-grid">
+        <section id="createPanel" class="home-form-panel">
+          <div class="step-number">1</div>
+          <h3>Create an Adventure</h3>
+          <p class="muted">Begin a new expedition, create your own hero, and send the five-letter room code to your friends.</p>
+          <div class="form-grid">
+            <label>Hero name<input id="createName" maxlength="18" autocomplete="off" placeholder="Enter your hero's name"></label>
+            <label>Background<select id="createBackground"></select></label>
+          </div>
+          <label>Choose class<select id="createClass"></select></label>
+          <div id="createClassInfo" class="class-preview"></div>
+          <div class="portrait-pick-wrap"><div class="small muted">Choose portrait</div><div id="createPortraits" class="portrait-picks"></div></div>
+          <button id="createBtn" class="btn btn-primary btn-large">Create Room</button>
+        </section>
+
+        <section id="joinPanel" class="home-form-panel hidden">
+          <div class="step-number">2</div>
+          <h3>Join an Adventure</h3>
+          <p class="muted">Enter the room code from the host, then create your hero and join the company.</p>
+          <label>Room code<input id="joinCode" class="code-input" maxlength="5" autocomplete="off" placeholder="ABCDE"></label>
+          <div class="form-grid">
+            <label>Hero name<input id="joinName" maxlength="18" autocomplete="off" placeholder="Enter your hero's name"></label>
+            <label>Background<select id="joinBackground"></select></label>
+          </div>
+          <label>Choose class<select id="joinClass"></select></label>
+          <div id="joinClassInfo" class="class-preview"></div>
+          <div class="portrait-pick-wrap"><div class="small muted">Choose portrait</div><div id="joinPortraits" class="portrait-picks"></div></div>
+          <button id="joinBtn" class="btn btn-secondary-accent btn-large">Join Room</button>
+        </section>
+
+        <section id="returnPanel" class="home-form-panel hidden">
+          <div class="step-number">↺</div>
+          <h3>Return to Existing Adventure</h3>
+          <p class="muted">If the adventure already started, the host should continue it first. Then enter the room code and your 4-digit Return PIN.</p>
+          <div class="form-grid">
+            <label>Room code<input id="returnCode" class="code-input" maxlength="5" autocomplete="off" placeholder="ABCDE"></label>
+            <label>Your Return PIN<input id="returnPin" class="code-input" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="1234"></label>
+          </div>
+          <button id="returnAdventureBtn" class="btn btn-secondary-accent btn-large">Return to My Hero</button>
+          <p class="small muted">Returning to the same browser? You may be able to use one of the quick options below instead.</p>
+        </section>
+      </div>
+    </section>
+
+    <div id="homeError" class="toast error hidden" role="alert"></div>
+
+    <div class="home-support-grid">
+      <section id="savedCampaignPanel" class="panel saved-campaign hidden">
+        <div>
+          <div class="eyebrow">CONTINUE WHERE YOU LEFT OFF</div>
+          <h2>Saved Adventure Found</h2>
+          <p id="savedCampaignInfo" class="muted">Your last expedition is safely stored here.</p>
+        </div>
+        <div class="saved-campaign__actions">
+          <button id="continueSavedBtn" class="btn btn-success">Continue Adventure</button>
+          <button id="copySaveHomeBtn" class="btn btn-ghost">Copy backup key</button>
+          <button id="forgetSaveBtn" class="btn btn-ghost">Forget saved campaign</button>
+        </div>
+      </section>
+
+      <section id="rejoinPanel" class="panel saved-campaign hidden">
+        <div>
+          <div class="eyebrow">QUICK RETURN</div>
+          <h2>Rejoin Your Last Room</h2>
+          <p id="rejoinInfo" class="muted">Try to reconnect to the last room from this browser.</p>
+        </div>
+        <div class="saved-campaign__actions">
+          <button id="rejoinLastBtn" class="btn btn-secondary-accent">Rejoin Last Room</button>
+        </div>
+      </section>
+    </div>
+
+    <details class="panel restore-backup home-advanced-tools">
+      <summary>Advanced recovery tools</summary>
+      <p class="muted small">Most players will not need this. Use it only if the host is restoring a campaign on another browser or device.</p>
+      <label>Backup key<textarea id="backupKeyInput" rows="3" placeholder="Paste the campaign backup key here"></textarea></label>
+      <button id="restoreBackupBtn" class="btn btn-ghost">Restore as Host</button>
+    </details>
+
+    <p class="home-footnote">One continuous adventure. Save at any point and return later. No player elimination; setbacks create new routes through the story.</p>
+  </section>
+
+<section id="lobby" class="screen hidden">
+    <header class="topbar">
+      <button class="btn btn-ghost btn-small menuBtn" type="button">← Main Menu</button>
+      <div>
+        <div class="eyebrow">EXPEDITION LOBBY</div>
+        <h1>Gather the Company</h1>
+      </div>
+      <div class="room-share">
+        <span class="small muted">ROOM CODE</span>
+        <strong id="roomCodeBig" class="room-code-big">-----</strong>
+        <button id="copyRoomBtn" class="btn btn-ghost btn-small">Copy code</button><span class="small muted">YOUR RETURN PIN</span><strong id="returnPinLobby" class="return-pin">----</strong>
+      </div>
+    </header>
+
+    <div class="lobby-grid">
+      <section class="panel hero-builder">
+        <div class="section-heading">
+          <div><div class="eyebrow">YOUR HERO</div><h2 id="youLabel">Choose your path</h2></div>
+          <span id="readyBadge" class="status-badge">Building</span>
+        </div>
+        <div id="heroGift" class="gift-box"></div>
+        <div class="builder-toolbar">
+          <div><strong>Allocate 20 points</strong><div class="small muted">Maximum 5 in any skill.</div></div>
+          <button id="recommendedBtn" class="btn btn-ghost btn-small">Use recommended build</button>
+        </div>
+        <div id="stats" class="stats-grid"></div>
+        <div class="points-meter"><div class="points-meter__top"><span>Points used</span><strong><span id="pointsUsed">0</span>/20</strong></div><div class="meter"><div id="pointsBar" class="meter__fill"></div></div></div>
+        <button id="readyBtn" class="btn btn-primary btn-large full">Lock Character</button>
+      </section>
+
+      <section class="panel company-panel">
+        <div class="section-heading"><div><div class="eyebrow">THE COMPANY</div><h2>Players in Room</h2></div><span id="playerCount" class="count-badge">1 / 6</span></div>
+        <div id="lobbyPlayers" class="player-list"></div>
+        <div id="lobbyHint" class="waiting-box"></div>
+        <button id="startBtn" class="btn btn-success btn-large full hidden">Begin the Expedition</button>
+      </section>
+    </div>
+  </section>
+
+  <section id="game" class="screen hidden">
+    <header class="topbar game-topbar">
+      <button class="btn btn-ghost btn-small menuBtn" type="button">← Main Menu</button>
+      <div><div class="eyebrow">THE BLACK SEAL</div><h1 id="sceneTitle">Greyhaven</h1></div>
+      <div class="game-status">
+        <div class="sound-row"><button id="heroSheetBtn" class="btn btn-secondary-accent btn-small" type="button">🧭 My Hero</button> <button id="soundToggle" class="btn btn-ghost btn-small" type="button">🔊 Sound on</button></div>
+        <div class="room-mini">Room <strong id="gameRoom"></strong> · Your Return PIN <strong id="returnPinGame">----</strong></div>
+        <div class="status-row"><span>Round <b id="round"></b></span><span>Hope <b id="hope"></b>/6</span><span>Threat <b id="threat"></b>/6</span></div>
+      </div>
+    </header>
+
+    <div class="game-grid">
+      <section class="panel story-panel">
+        <div id="sceneArt" class="scene-art" role="img" aria-label="Story scene illustration"><div class="scene-art__icon"></div><div class="scene-art__caption"></div></div><div id="npcMoment" class="npc-moment hidden"></div><div id="callbackPanel" class="callback-panel hidden"></div>
+        <div id="sceneText" class="story"></div>
+        <div id="turnNotice" class="turn-notice"></div>
+        <div id="choices" class="choice-list"></div>
+        <div id="challenge" class="hidden"></div>
+        <div id="rollResult"></div>
+        <div id="secret" class="secret hidden"></div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel"><div class="section-heading"><div><div class="eyebrow">PARTY</div><h2>Company</h2></div></div><div id="party" class="player-list"></div></section>
+        <section class="panel mission-card"><div class="eyebrow">CURRENT MISSION</div><h2>Objective</h2><p id="mission"></p><div class="resource-row"><span>🎒 Supplies <b id="supplies"></b></span><span>🜂 Relics <b id="relics"></b></span></div><div id="pressureNote" class="pressure-note low"></div></section>
+        <section class="panel inventory-card"><div class="eyebrow">EXPEDITION PACK</div><h2>Special Items</h2><div id="inventory" class="inventory-list"></div></section>
+        <section class="panel journey-card"><div class="eyebrow">JOURNEY SO FAR</div><h2>Map of Greyhaven</h2><div id="journey" class="journey-list"></div></section>
+
+        <section id="hostTools" class="panel host-tools hidden">
+          <div class="eyebrow">HOST TOOLS</div>
+          <h2>Keep the Game Moving</h2>
+          <p class="small muted">Campaign progress is automatically saved in the host browser after every change.</p>
+          <div id="saveStatus" class="save-status">✓ Auto-save ready</div>
+          <button id="copyCampaignBtn" class="btn btn-ghost full">Copy campaign backup key</button>
+          <button id="resetChallengeBtn" class="btn btn-ghost full">Reset current challenge</button>
+          <button id="skipTurnBtn" class="btn btn-ghost full">Skip stuck turn</button>
+          <div id="removePlayerWrap" class="hidden remove-player-wrap">
+            <label>Disconnected player<select id="disconnectedPlayer"></select></label>
+            <button id="removeDisconnectedBtn" class="btn btn-ghost full">Remove disconnected player</button>
+          </div>
+        </section>
+        <section class="panel rules-card"><div class="eyebrow">QUICK RULES</div><h2>Risk & Teamwork</h2><p><b>Solo:</b> one hero resolves the challenge with one of its listed skills.</p><p><b>Support:</b> one helper may try to add +2. At Threat 3+, Support needs 7+.</p><p><b>Team:</b> major crises use up to three heroes. All roles succeeding gives full success; one missed role usually creates a partial success.</p><p><b>Hope:</b> after a setback, the active hero may spend 2 Hope to turn it into a partial success.</p><p><b>Threat:</b> at 5+, dangerous challenge targets increase by 1.</p><p><b>Intervention:</b> each hero can attempt one Heroic Intervention before a setback is accepted.</p></section>
+        <section class="panel"><div class="eyebrow">JOURNAL</div><h2>Expedition Log</h2><div id="log" class="log-list"></div></section>
+      </aside>
+    </div>
+  </section>
+
+  <section id="ended" class="screen hidden">
+    <div class="panel ending-panel"><button class="btn btn-ghost btn-small menuBtn" type="button">← Main Menu</button>
+      <div class="eyebrow">CAMPAIGN COMPLETE</div>
+      <h1>Dawn Over Greyhaven</h1>
+      <div id="endingArt" class="scene-art ending-art"><div class="scene-art__icon">🏰</div><div class="scene-art__caption">Greyhaven after the night of the coup</div></div>
+      <div id="endingText" class="story"></div>
+      <div class="next-session"><div class="eyebrow">NEXT SESSION</div><h2>Into the Green Ruins</h2><p>Find the missing survivors, discover who lit the beacon, and learn why a ruined city carries the crest of a kingdom destroyed eight centuries ago.</p></div>
+    </div>
+  </section>
+</main>
+<div id="heroSheetModal" class="hero-sheet-modal hidden" role="dialog" aria-modal="true" aria-labelledby="heroSheetTitle">
+  <div class="hero-sheet-card">
+    <div class="hero-sheet-head"><div><div class="eyebrow">MY HERO</div><h2 id="heroSheetTitle">Character Sheet</h2></div><button id="heroSheetClose" class="btn btn-ghost btn-small" type="button">Close</button></div>
+    <div id="heroSheetBody"></div>
+  </div>
+</div>
+<div id="sceneReveal" class="scene-reveal hidden" aria-live="polite">
+  <div class="scene-reveal__content">
+    <div id="revealKicker" class="eyebrow">THE BLACK SEAL</div>
+    <h2 id="revealTitle">The Sky Breaks</h2>
+    <p id="revealText"></p>
+  </div>
+</div>
+<div id="outcomeModal" class="outcome-modal hidden" role="dialog" aria-modal="true" aria-labelledby="outcomeTitle">
+  <div class="outcome-card">
+    <div id="outcomeLabel" class="eyebrow">OUTCOME</div>
+    <h2 id="outcomeTitle">The story changes</h2>
+    <p id="outcomeBody"></p>
+    <div id="outcomeMoments" class="outcome-moments"></div>
+    <div id="outcomeNext" class="outcome-next"></div>
+    <button id="outcomeContinue" type="button" class="btn btn-primary btn-large full">Continue</button>
+  </div>
+</div>
+<div id="consequenceToast" class="consequence-toast hidden" aria-live="polite"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
