@@ -14,7 +14,7 @@ const sceneArt={
  arrival:['🏰','Greyhaven at festival dusk'],ambush:['⚔️','Steel in the North Gate'],courier:['🕯️','The courier’s last warning'],market_chase:['🏃','A shadow through the market'],rooftops:['🌆','Across the tiled roofs'],watch_house:['🛡️','The Crown Watch'],lantern_cellar:['🍺','The Lantern Cellar'],guildhall:['🗝️','The guild beneath the city'],customs_archive:['📜','Ledgers and sealed names'],palace_audience:['👑','A summons to the palace'],river_docks:['⚓','Fog on the King’s River'],warehouse:['📦','The warehouse with no owner'],masquerade:['🎭','Masks at Vane House'],prince_attack:['🗡️','The blade behind the music'],council:['🏛️','The emergency council'],old_tower:['🗼','The abandoned watchtower'],undercrypt:['🕳️','Stairs beneath the old city'],gate_chamber:['◈','The Gate of Kings'],betrayal:['♟️','The move no one expected'],coup_begins:['🔥','Bells over a city in revolt'],west_gate:['🚪','The seized West Gate'],palace_siege:['🏰','The palace under siege'],arsenal:['⚙️','The royal arsenal'],final_council:['👑','Who still stands with the Crown'],gate_awakens:['✨','The old gate wakes'],final_crisis:['🔥','Three battles, one city'],black_seal:['🜂','The Black Seal']
 };
 const sceneImages={
- arrival:'assets/title.jpg',ambush:'assets/consequence.jpg',courier:'assets/party.jpg',market_chase:'assets/random.jpg',rooftops:'assets/recap.jpg',watch_house:'assets/party.jpg',lantern_cellar:'assets/random.jpg',guildhall:'assets/chest.jpg',customs_archive:'assets/recap.jpg',palace_audience:'assets/serayne_council_bespoke.jpg',river_docks:'assets/storm.jpg',warehouse:'assets/chest.jpg',masquerade:'assets/party.jpg',prince_attack:'assets/consequence.jpg',council:'assets/serayne_council_bespoke.jpg',old_tower:'assets/recap.jpg',undercrypt:'assets/mountain_gate_bespoke.jpg',gate_chamber:'assets/heart_aranor_bespoke.jpg',betrayal:'assets/consequence.jpg',coup_begins:'assets/order_landing_bespoke.jpg',west_gate:'assets/storm.jpg',palace_siege:'assets/white_city_finale_bespoke.jpg',arsenal:'assets/dice.jpg',final_council:'assets/party.jpg',gate_awakens:'assets/heart_aranor_bespoke.jpg',final_crisis:'assets/consequence.jpg',black_seal:'assets/white_city_finale_bespoke.jpg'
+ arrival:'assets/title.jpg',ambush:'assets/consequence.jpg',courier:'assets/black_gate_ambush.jpg',market_chase:'assets/black_lantern_ward.jpg',rooftops:'assets/black_lantern_ward.jpg',watch_house:'assets/black_gate_ambush.jpg',lantern_cellar:'assets/black_lantern_ward.jpg',guildhall:'assets/black_lantern_ward.jpg',customs_archive:'assets/black_docks.jpg',palace_audience:'assets/serayne_council_bespoke.jpg',river_docks:'assets/storm.jpg',warehouse:'assets/black_docks.jpg',masquerade:'assets/black_masquerade.jpg',prince_attack:'assets/consequence.jpg',council:'assets/serayne_council_bespoke.jpg',old_tower:'assets/black_gate_kings.jpg',undercrypt:'assets/black_gate_kings.jpg',gate_chamber:'assets/black_gate_kings.jpg',betrayal:'assets/consequence.jpg',coup_begins:'assets/order_landing_bespoke.jpg',west_gate:'assets/storm.jpg',palace_siege:'assets/white_city_finale_bespoke.jpg',arsenal:'assets/black_city_siege.jpg',final_council:'assets/black_finale.jpg',gate_awakens:'assets/heart_aranor_bespoke.jpg',final_crisis:'assets/consequence.jpg',black_seal:'assets/white_city_finale_bespoke.jpg'
 };
 Object.assign(sceneImages,{
   arrival:'assets/black_home.jpg',ambush:'assets/black_gate_ambush.jpg',alley_detour:'assets/black_gate_ambush.jpg',courier:'assets/black_gate_ambush.jpg',market_chase:'assets/black_lantern_ward.jpg',rooftops:'assets/black_lantern_ward.jpg',watch_house:'assets/black_home.jpg',
@@ -29,7 +29,11 @@ const portraitChoice={create:1,join:1};
 const portraitPath=(cls,n=1)=>portraitImages[cls]?.[Math.max(0,Math.min(2,Number(n||1)-1))]||portraitImages[cls]?.[0]||'assets/portraits.jpg';
 const npcInfo={Calder:{name:'Captain Renn Calder',img:'assets/npc_calder.jpg',tag:'Captain of the Crown Watch'},Lysa:{name:'Lysa Quick',img:'assets/npc_lysa.jpg',tag:'Runner of the Lantern Ward'},Elira:{name:'Lady Elira Vane',img:'assets/npc_elira.jpg',tag:'Keeper of the King’s Secrets'},Cael:{name:'Brother Cael',img:'assets/npc_cael.jpg',tag:'Scholar of the old city'},Corvin:{name:'Lord Marshal Corvin Veyr',img:'assets/npc_corvin.jpg',tag:'Commander of Greyhaven’s armies'}};
 let me=null,state=null,myStats=emptyStats(),roomCode='';
-let audioOn=true,lastSceneSeen=null,lastRollSeen='',previousSnapshot=null,suppressNextSceneReveal=false;
+let audioOn=true,ambientOn=readJson('blackSealAmbient')!==false,lastSceneSeen=null,lastRollSeen='',dismissedRollKey='',previousSnapshot=null,suppressNextSceneReveal=false,pendingStoryBridge=null;
+let ambientScene=null,ambientMaster=null,ambientNodes=[],ambientTimer=null;
+let voiceJoined=false,voiceMuted=false,localVoiceStream=null,voiceAnalyserFrame=null,localSpeaking=false;
+const voicePeers=new Map(),voiceSpeaking=new Map();
+const voiceRtcConfig={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']}]};
 let sessionInfo=readJson('blackSealSession');
 let campaignSave=readJson('blackSealCampaign');
 let privateClues=[];
@@ -84,12 +88,13 @@ renderClassPreview('createClass','createClassInfo','create');renderClassPreview(
 ['createBackground','joinBackground'].forEach(id=>{if(!$(id))return;$(id).innerHTML=Object.entries(backgrounds).map(([k,v])=>`<option value="${k}">${k} — ${v.edge}</option>`).join('');});
 
 document.addEventListener('pointerdown',()=>{
-  try{const AC=window.AudioContext||window.webkitAudioContext;if(AC&&!playSound.ctx)playSound.ctx=new AC();if(playSound.ctx?.state==='suspended')playSound.ctx.resume();}catch{}
+  try{const AC=window.AudioContext||window.webkitAudioContext;if(AC&&!playSound.ctx)playSound.ctx=new AC();if(playSound.ctx?.state==='suspended')playSound.ctx.resume();if(state?.phase==='playing'&&ambientOn)updateAmbience(state.scene,true);}catch{}
 },{once:true});
 
 $('createBtn').onclick=()=>emitJoin('create');$('joinBtn').onclick=()=>emitJoin('join');$('joinCode').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''));
 $('copyRoomBtn').onclick=async()=>{try{await navigator.clipboard.writeText(roomCode);$('copyRoomBtn').textContent='Copied!';setTimeout(()=>$('copyRoomBtn').textContent='Copy code',1400);}catch{$('copyRoomBtn').textContent=roomCode;}};
-if($('soundToggle'))$('soundToggle').onclick=()=>{audioOn=!audioOn;$('soundToggle').textContent=audioOn?'🔊 Sound on':'🔇 Sound off';if(audioOn)playSound('success');};
+if($('soundToggle'))$('soundToggle').onclick=()=>{audioOn=!audioOn;$('soundToggle').textContent=audioOn?'🔊 SFX on':'🔇 SFX off';if(audioOn)playSound('success');};
+if($('ambientToggle')){$('ambientToggle').textContent=ambientOn?'🌿 Ambience on':'🌿 Ambience off';$('ambientToggle').onclick=()=>{ambientOn=!ambientOn;writeJson('blackSealAmbient',ambientOn);$('ambientToggle').textContent=ambientOn?'🌿 Ambience on':'🌿 Ambience off';if(ambientOn&&state?.phase==='playing')updateAmbience(state.scene,true);else stopAmbience();};}
 if($('rejoinLastBtn'))$('rejoinLastBtn').onclick=()=>{sessionInfo=readJson('blackSealSession');if(!sessionInfo?.roomCode||!sessionInfo?.resumeToken)return showError('No recent room was found.');socket.emit('resumeRoom',{roomCode:sessionInfo.roomCode,resumeToken:sessionInfo.resumeToken});};
 if($('continueSavedBtn'))$('continueSavedBtn').onclick=()=>{campaignSave=readJson('blackSealCampaign');sessionInfo=readJson('blackSealSession');if(!campaignSave?.saveToken||!sessionInfo?.resumeToken)return showError('No saved campaign was found in this browser.');socket.emit('restoreCampaign',{saveToken:campaignSave.saveToken,resumeToken:sessionInfo.resumeToken});};
 if($('copySaveHomeBtn'))$('copySaveHomeBtn').onclick=()=>copyText(readJson('blackSealCampaign')?.saveToken,$('copySaveHomeBtn'));
@@ -109,7 +114,9 @@ if($('returnPin'))$('returnPin').addEventListener('input',e=>e.target.value=e.ta
 if($('returnAdventureBtn'))$('returnAdventureBtn').onclick=()=>{const code=$('returnCode').value.trim().toUpperCase(),pin=$('returnPin').value.trim();if(code.length!==5)return showError('Enter the five-letter room code.');if(pin.length!==4)return showError('Enter your four-digit Return PIN.');socket.emit('returnToRoom',{roomCode:code,returnPin:pin});};
 function returnToMainMenu(){
   if(state&&me)socket.emit('leaveRoomView');
-  me=null;state=null;roomCode='';lastSceneSeen=null;lastRollSeen='';previousSnapshot=null;show('home');refreshSavedCampaignUI();
+  if(voiceJoined)leaveVoice();
+  stopAmbience();
+  me=null;state=null;roomCode='';lastSceneSeen=null;lastRollSeen='';dismissedRollKey='';previousSnapshot=null;pendingStoryBridge=null;show('home');refreshSavedCampaignUI();
 }
 document.querySelectorAll('.menuBtn').forEach(b=>b.addEventListener('click',()=>{if(confirm('Return to the main menu? Your hero and campaign progress will be kept.'))returnToMainMenu();}));
 socket.on('leftRoomView',()=>{show('home');refreshSavedCampaignUI();});
@@ -130,7 +137,7 @@ socket.on('state',s=>{
   if(!me)return;
   const p=s.players.find(x=>x.id===me);if(p?.ready&&used()===0)myStats={...p.stats};
   if(old) handleAtmosphere(old,s);
-  if(s.phase==='lobby')renderLobby();else if(s.phase==='playing')renderGame();else if(s.phase==='ended')renderEnding();if($('heroSheetModal')&&!$('heroSheetModal').classList.contains('hidden'))renderHeroSheet();
+  if(s.phase==='lobby')renderLobby();else if(s.phase==='playing')renderGame();else if(s.phase==='ended')renderEnding();if(voiceJoined)syncVoicePeers();if($('heroSheetModal')&&!$('heroSheetModal').classList.contains('hidden'))renderHeroSheet();
 });
 
 function renderLobby(){
@@ -148,6 +155,7 @@ function renderLobby(){
   const host=state.hostId===me, allReady=state.players.every(x=>x.ready);
   $('startBtn').classList.toggle('hidden',!host);$('startBtn').disabled=!allReady;$('startBtn').onclick=()=>socket.emit('startGame');
   $('lobbyHint').innerHTML=host?(allReady?'<b>Everyone is ready.</b> You can begin the expedition.':'You are the <b>host</b>. Start once every hero shows Ready.'):'Waiting for the host to begin. You can stay on this screen while everyone finishes their hero.';
+  renderVoiceUi();
 }
 function playerCard(p,inGame){const g=(state?.groups||[]).find(x=>(x.playerIds||[]).includes(p.id));const groupTag=state?.groups?.length>1?` · ${esc(g?.name||'Separated')}`:'';return `<div class="player-card ${p.id===me?'you':''} ${inGame&&state.players[state.activeIndex]?.id===p.id?'active':''}"><div class="player-ident"><img class="mini-portrait" src="${portraitPath(p.cls,p.portrait)}" alt="${p.cls}"><div><b>${esc(p.name)}</b><div class="small muted">${p.cls} · ${p.background||'Outlander'}${p.talent?' · '+p.talent:''}${groupTag}</div></div></div><div class="small ${p.connected?'ready':'muted'}">${p.connected?'● Online':'○ Away'}${p.ready?' · Ready':''}</div></div>`;}
 
@@ -418,12 +426,12 @@ function finaleCallbackCards(){const a=state.allies||{},f=state.flags||{},items=
 function renderFinaleCallbacks(scene){const box=$('callbackPanel');if(!box)return;const finale=['coup_begins','west_gate','palace_siege','arsenal','final_council','gate_awakens','final_crisis','black_seal'];if(!finale.includes(scene)){box.classList.add('hidden');box.innerHTML='';return;}const cards=finaleCallbackCards();if(!cards.length){box.classList.add('hidden');return;}box.innerHTML=`<div class="eyebrow">THE CITY REMEMBERS</div><div class="callback-grid">${cards.map(c=>`<div class="callback-card"><span>${c[0]}</span><div><b>${esc(c[1])}</b><p>${esc(c[2])}</p></div></div>`).join('')}</div>`;box.classList.remove('hidden');}
 function renderGame(){
   show('game');const sc=scenes[state.scene];if(!sc)return;
-  $('sceneTitle').textContent=sc.title;$('sceneText').innerHTML=sc.text.map(x=>`<p>${x}</p>`).join('');$('mission').textContent=sc.mission;
-  const art=sceneArt[state.scene]||['🧭',sc.title],image=sceneImages[state.scene]||'assets/recap.jpg';const [icon,caption]=art;$('sceneArt').className=`scene-art ${state.scene}`;$('sceneArt').style.backgroundImage=`linear-gradient(0deg,rgba(5,10,18,.76),rgba(5,10,18,.08)),url('${image}')`;$('sceneArt').querySelector('.scene-art__icon').textContent=icon;$('sceneArt').querySelector('.scene-art__caption').textContent=caption;renderNpcMoment(state.scene);renderFinaleCallbacks(state.scene);
+  $('sceneTitle').textContent=sc.title;$('sceneText').innerHTML=sc.text.map(x=>`<p>${x}</p>`).join('');$('mission').textContent=sc.mission;const bridge=$('storyBridge');if(bridge){if(pendingStoryBridge&&pendingStoryBridge.scene===state.scene){bridge.innerHTML=`<p>${esc(pendingStoryBridge.text)}</p>`;bridge.classList.remove('hidden');}else bridge.classList.add('hidden');}
+  const art=sceneArt[state.scene]||['🧭',sc.title],image=sceneImages[state.scene]||'assets/black_home.jpg';const [icon,caption]=art;$('sceneArt').className=`scene-art ${state.scene}`;$('sceneArt').style.backgroundImage=`linear-gradient(0deg,rgba(5,10,18,.76),rgba(5,10,18,.08)),url('${image}')`;$('sceneArt').querySelector('.scene-art__icon').textContent=icon;$('sceneArt').querySelector('.scene-art__caption').textContent=caption;renderNpcMoment(state.scene);renderFinaleCallbacks(state.scene);
   $('round').textContent=state.round;$('hope').textContent=state.hope;$('threat').textContent=state.threat;$('supplies').textContent=state.supplies;$('relics').textContent=state.relics;if($('pressureNote')){$('pressureNote').textContent=threatStatusText(state.threat);$('pressureNote').className='pressure-note '+(state.threat>=5?'high':state.threat>=3?'mid':'low');}
   const active=state.players[state.activeIndex],mine=active?.id===me,waiting=(state.groups||[]).find(g=>g.id===state.currentGroupId)?.waitingMerge;$('turnNotice').className='turn-notice'+(mine?' mine':'');$('turnNotice').innerHTML=waiting?`<b>${esc(state.currentGroupName||'Your group')} has reached the rendezvous.</b> The other group is still on its route.`:mine?`<b>Your turn, ${esc(active.name)}.</b> Choose what your hero does next.${state.groups?.length>1?` <span class="group-badge">${esc(state.currentGroupName)}</span>`:''}`:`Waiting for <b>${esc(active?.name||'')}</b>${state.groups?.length>1?` · ${esc((state.groups||[]).find(g=>(g.playerIds||[]).includes(active?.id))?.name||'another group')}`:''}.`;
   $('choices').innerHTML=''; if(!state.pending){sc.choices.forEach(choice=>{const [id,label,note]=choice,available=requirementSatisfied(choice);const b=document.createElement('button');b.className='choice';b.disabled=!mine||!available;b.innerHTML=`<b>${label}</b><span>${note}${available?'':' · NOT CURRENTLY AVAILABLE'}</span>`;b.onclick=()=>socket.emit('chooseAction',{action:id});$('choices').appendChild(b);});}
-  renderChallenge(mine);renderHostTools();renderInventory();renderJourney();$('party').innerHTML=state.players.map(p=>playerCard(p,true)).join('');$('log').innerHTML=state.log.slice().reverse().map(x=>`<div class="log-item">• ${esc(x)}</div>`).join('');renderLastRoll();
+  renderChallenge(mine);renderHostTools();renderInventory();renderJourney();renderVoiceUi();$('party').innerHTML=state.players.map(p=>playerCard(p,true)).join('');$('log').innerHTML=state.log.slice().reverse().map(x=>`<div class="log-item">• ${esc(x)}</div>`).join('');renderLastRoll();
 }
 
 function renderHeroSheet(){
@@ -499,6 +507,7 @@ function renderChallenge(mine){
 }
 function renderLastRoll(){
   const r=state.lastRoll;if(!r){$('rollResult').innerHTML='';return;}
+  const key=JSON.stringify(r);if(key===dismissedRollKey){$('rollResult').innerHTML='';return;}
   let html='';
   const heroicHtml=r.heroicMoment?`<div class="heroic-callout">✨ HEROIC MOMENT — ${esc(r.heroicEffect||'the exceptional roll creates an extra advantage.')}</div>`:'';
   const complicationHtml=r.complication?`<div class="complication-callout">⚠️ UNEXPECTED COMPLICATION — ${esc(r.complicationEffect||'something else goes wrong despite the main action.')}</div>`:'';
@@ -513,9 +522,8 @@ function renderLastRoll(){
     const mainDie=r.rollMode==='advantage'?Math.max(...r.dice):r.rollMode==='disadvantage'?Math.min(...r.dice):r.dice.reduce((a,b)=>a+b,0);
     html=`<div class="roll-card cinematic-result"><b>${esc(r.desc)}</b><div class="dice-row">${r.dice.map(d=>`<span class="die rolling">${d}</span>`).join('')}</div><p>Main roll: ${mainDie} + skill ${r.bonus}${r.supportBonus?` + support ${r.supportBonus}`:''} = <b>${r.total}</b> vs ${r.difficulty}</p>${r.support?`<p class="small">${esc(r.support.name)} supported with ${esc(r.support.skill)}: ${r.support.total} ${r.support.ok?'✓ +2':'✕ no bonus'}</p>`:''}${heroicHtml}${complicationHtml}<div class="result-banner ${r.success?'ok':'bad'}">${r.success?'SUCCESS!':'SETBACK'}</div>${!r.success?`<p class="small muted">${r.dangerous?'This was dangerous — the active hero may be wounded.':'No wound: this setback changes the situation instead.'}</p>`:''}</div>`;
   }
-  $('rollResult').innerHTML=html;
-  const key=JSON.stringify(r);
-  if(key!==lastRollSeen){lastRollSeen=key;playSound(r.success===false?'fail':'dice');setTimeout(()=>playSound(r.success===false?'fail':'success'),480);}
+  $('rollResult').innerHTML=html;const card=$('rollResult').querySelector('.roll-card');if(card){card.classList.add('dismissible-result');card.setAttribute('title','Click to dismiss');card.insertAdjacentHTML('beforeend','<div class="dismiss-result-hint">Dismiss ×</div>');card.onclick=()=>{dismissedRollKey=key;$('rollResult').innerHTML='';};}
+  if(key!==lastRollSeen){lastRollSeen=key;dismissedRollKey='';playSound(r.success===false?'fail':'dice');setTimeout(()=>playSound(r.success===false?'fail':'success'),480);}
 }
 function renderEnding(){
   show('ended');
@@ -561,6 +569,103 @@ function heroEpilogue(p){
   return byClass[p.cls]||`${p.name} carried the story of Greyhaven into the years that followed.`;
 }
 
+function renderVoiceUi(){
+  const players=state?.players||[],joined=players.filter(p=>p.voiceJoined);
+  const status=voiceJoined?`${joined.length} connected`:'Not connected';
+  ['voiceLobbyStatus','voiceGameStatus'].forEach(id=>{const el=$(id);if(el)el.textContent=status;});
+  document.querySelectorAll('.voiceJoinBtn').forEach(b=>b.classList.toggle('hidden',voiceJoined));
+  document.querySelectorAll('.voiceMuteBtn').forEach(b=>{b.classList.toggle('hidden',!voiceJoined);b.textContent=voiceMuted?'Unmute':'Mute';});
+  document.querySelectorAll('.voiceLeaveBtn').forEach(b=>b.classList.toggle('hidden',!voiceJoined));
+  const html=joined.length?joined.map(p=>{const speaking=p.id===me?localSpeaking:voiceSpeaking.get(p.id);const icon=p.voiceMuted?'🔇':speaking?'🔊':'🎙';return `<div class="voice-person ${speaking&&!p.voiceMuted?'speaking':''}"><span>${icon}</span><b>${esc(p.name)}</b>${p.id===me?'<em>You</em>':''}</div>`;}).join(''):'<span class="muted">No one has joined voice yet.</span>';
+  ['voiceLobbyList','voiceGameList'].forEach(id=>{const el=$(id);if(el)el.innerHTML=html;});
+}
+function bindVoiceButtons(){
+  document.querySelectorAll('.voiceJoinBtn').forEach(b=>b.onclick=joinVoice);
+  document.querySelectorAll('.voiceMuteBtn').forEach(b=>b.onclick=toggleVoiceMute);
+  document.querySelectorAll('.voiceLeaveBtn').forEach(b=>b.onclick=leaveVoice);
+}
+bindVoiceButtons();
+async function joinVoice(){
+  if(voiceJoined||!me||!state)return;
+  if(!navigator.mediaDevices?.getUserMedia)return showConsequence('Voice unavailable','This browser does not provide microphone access.','bad');
+  try{
+    localVoiceStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+    voiceJoined=true;voiceMuted=false;socket.emit('voiceJoin');startLocalSpeakingDetector();renderVoiceUi();syncVoicePeers();
+  }catch(e){voiceJoined=false;showConsequence('Microphone not connected','Allow microphone access to use optional voice chat.','bad');}
+}
+function toggleVoiceMute(){
+  if(!voiceJoined||!localVoiceStream)return;voiceMuted=!voiceMuted;for(const t of localVoiceStream.getAudioTracks())t.enabled=!voiceMuted;socket.emit('voiceSetMuted',{muted:voiceMuted});if(voiceMuted)setLocalSpeaking(false);renderVoiceUi();
+}
+function leaveVoice(){
+  if(voiceJoined)socket.emit('voiceLeave');voiceJoined=false;voiceMuted=false;setLocalSpeaking(false);stopLocalSpeakingDetector();
+  if(localVoiceStream){localVoiceStream.getTracks().forEach(t=>t.stop());localVoiceStream=null;}
+  for(const id of [...voicePeers.keys()])closeVoicePeer(id);renderVoiceUi();
+}
+function closeVoicePeer(id){const pc=voicePeers.get(id);if(pc){try{pc.close();}catch{}voicePeers.delete(id);}const a=document.getElementById(`voice-audio-${id}`);if(a)a.remove();voiceSpeaking.delete(id);}
+function attachRemoteVoice(id,stream){let a=document.getElementById(`voice-audio-${id}`);if(!a){a=document.createElement('audio');a.id=`voice-audio-${id}`;a.autoplay=true;a.playsInline=true;a.className='remote-voice-audio';document.body.appendChild(a);}a.srcObject=stream;a.play?.().catch(()=>{});}
+async function ensureVoicePeer(id,initiate=false){
+  if(!voiceJoined||!localVoiceStream||id===me)return null;if(voicePeers.has(id))return voicePeers.get(id);
+  const pc=new RTCPeerConnection(voiceRtcConfig);pc._queued=[];voicePeers.set(id,pc);
+  for(const track of localVoiceStream.getTracks())pc.addTrack(track,localVoiceStream);
+  pc.onicecandidate=e=>{if(e.candidate)socket.emit('voiceSignal',{targetPlayerId:id,candidate:e.candidate});};
+  pc.ontrack=e=>attachRemoteVoice(id,e.streams[0]);
+  pc.onconnectionstatechange=()=>{if(['failed','closed','disconnected'].includes(pc.connectionState)&&pc.connectionState!=='disconnected')closeVoicePeer(id);renderVoiceUi();};
+  if(initiate){try{const offer=await pc.createOffer();await pc.setLocalDescription(offer);socket.emit('voiceSignal',{targetPlayerId:id,description:pc.localDescription});}catch{}}
+  return pc;
+}
+function syncVoicePeers(){
+  if(!voiceJoined||!state)return;const ids=new Set((state.players||[]).filter(p=>p.voiceJoined&&p.id!==me).map(p=>p.id));
+  for(const id of [...voicePeers.keys()])if(!ids.has(id))closeVoicePeer(id);
+  for(const id of ids)ensureVoicePeer(id,String(me)<String(id));
+}
+socket.on('voiceSignal',async({fromPlayerId,description,candidate})=>{
+  if(!voiceJoined||!localVoiceStream)return;const pc=await ensureVoicePeer(fromPlayerId,false);if(!pc)return;
+  try{
+    if(description){
+      if(description.type==='offer'){if(pc.signalingState!=='stable')try{await pc.setLocalDescription({type:'rollback'});}catch{}await pc.setRemoteDescription(description);for(const c of pc._queued.splice(0))await pc.addIceCandidate(c);const ans=await pc.createAnswer();await pc.setLocalDescription(ans);socket.emit('voiceSignal',{targetPlayerId:fromPlayerId,description:pc.localDescription});}
+      else if(description.type==='answer'&&pc.signalingState==='have-local-offer'){await pc.setRemoteDescription(description);for(const c of pc._queued.splice(0))await pc.addIceCandidate(c);}
+    }else if(candidate){if(pc.remoteDescription)await pc.addIceCandidate(candidate);else pc._queued.push(candidate);}
+  }catch{}
+});
+socket.on('voicePeerLeft',x=>{closeVoicePeer(x.playerId);renderVoiceUi();});
+socket.on('voiceSpeaking',x=>{voiceSpeaking.set(x.playerId,!!x.speaking);renderVoiceUi();});
+socket.on('voiceMuted',x=>{voiceSpeaking.set(x.playerId,false);renderVoiceUi();});
+function setLocalSpeaking(v){v=!!v&&!voiceMuted;if(localSpeaking===v)return;localSpeaking=v;if(voiceJoined)socket.emit('voiceSpeaking',{speaking:v});renderVoiceUi();}
+function startLocalSpeakingDetector(){
+  stopLocalSpeakingDetector();if(!localVoiceStream)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=playSound.ctx||(playSound.ctx=new AC());const src=ctx.createMediaStreamSource(localVoiceStream),an=ctx.createAnalyser();an.fftSize=512;src.connect(an);const data=new Uint8Array(an.fftSize);let quiet=0;const tick=()=>{if(!voiceJoined||!localVoiceStream)return;an.getByteTimeDomainData(data);let sum=0;for(const x of data){const d=(x-128)/128;sum+=d*d;}const rms=Math.sqrt(sum/data.length);if(rms>.035&&!voiceMuted){quiet=0;setLocalSpeaking(true);}else if(++quiet>6)setLocalSpeaking(false);voiceAnalyserFrame=requestAnimationFrame(tick);};tick();}catch{}
+}
+function stopLocalSpeakingDetector(){if(voiceAnalyserFrame)cancelAnimationFrame(voiceAnalyserFrame);voiceAnalyserFrame=null;}
+
+function ambientCategory(scene){
+  if(['arrival','ambush','courier','watch_house','city_crossroads','waiting_reunion','market_chase'].includes(scene))return 'city';
+  if(['rooftops','lantern_cellar','guildhall','customs_archive','archive_alarm','lantern_entry','candle_market','rooftop_message','guild_doors','rook_terms','hidden_ledger','lantern_rope_bridge','dye_court','old_shrine','whisper_house','guild_stair','bell_street','clockmaker_lane','tiled_roofs'].includes(scene))return 'streets';
+  if(['river_docks','warehouse','canal_escape','dock_checkpoint','fish_market','barge_row','ropewalk','warehouse_watch','canal_gate','ropeyard_watch','chandlers_lane','night_ferry','customs_tunnel','warehouse_roof','drowned_street'].includes(scene))return 'shore';
+  if(['palace_audience','masquerade','garden_meeting','prince_attack','council','palace_route_choice','court_gate','mask_gallery','music_room','balcony_watch','royal_gallery','court_merge','portrait_corridor','card_room','moon_balcony','chapel_antechamber','service_gate','kitchen_pass','linen_stairs','servant_archive','hidden_landing','service_merge','pantry_crossing','laundry_court','page_passage'].includes(scene))return 'hall';
+  if(['old_tower','undercrypt','gate_chamber','gate_guard','betrayal','prison','secret_tunnel','old_city_choice','old_belfry','tower_archive','bell_loft','observatory','rain_gallery','aqueduct_entry','flood_steps','cistern','smuggler_chapel','iron_door','drain_lock','salt_vault','whisper_culvert','furnace_room'].includes(scene))return 'cave';
+  if(['city_riot','guild_choice','watch_choice','coup_begins','coup_wave','coup_split','west_gate','gate_barricade','gate_tower','gate_counterattack','wall_walk','chain_room','outer_yard','arsenal','arsenal_yard','powder_room','arsenal_hold','forge_floor','cart_shed','armoury_gallery','palace_siege','final_council','gate_awakens','final_crisis','black_seal'].includes(scene))return 'battle';
+  return 'streets';
+}
+function stopAmbience(){if(ambientTimer){clearInterval(ambientTimer);ambientTimer=null;}for(const n of ambientNodes){try{if(n.stop)n.stop();}catch{}try{n.disconnect();}catch{}}ambientNodes=[];if(ambientMaster){try{ambientMaster.disconnect();}catch{}ambientMaster=null;}ambientScene=null;}
+function makeNoiseSource(ctx){const len=ctx.sampleRate*3,b=ctx.createBuffer(1,len,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;const s=ctx.createBufferSource();s.buffer=b;s.loop=true;return s;}
+function ambientNoise(ctx,master,{gain=.02,low=0,high=0,type='lowpass'}={}){const src=makeNoiseSource(ctx),f=ctx.createBiquadFilter(),g=ctx.createGain();f.type=type;f.frequency.value=high||low||900;g.gain.value=gain;src.connect(f);f.connect(g);g.connect(master);src.start();ambientNodes.push(src,f,g);return {src,f,g};}
+function ambientTone(ctx,master,freq,gain=.006){const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=freq;g.gain.value=gain;o.connect(g);g.connect(master);o.start();ambientNodes.push(o,g);return o;}
+function birdChirp(ctx,master){if(!ambientOn||ambientCategory(state?.scene)!=='forest')return;const o=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;o.type='sine';o.frequency.setValueAtTime(1650,now);o.frequency.exponentialRampToValueAtTime(2450,now+.12);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.012,now+.02);g.gain.exponentialRampToValueAtTime(.0001,now+.22);o.connect(g);g.connect(master);o.start(now);o.stop(now+.25);}
+function updateAmbience(scene,force=false){
+  if(!ambientOn||!scene){stopAmbience();return;}const cat=ambientCategory(scene);if(!force&&ambientScene===cat&&ambientMaster)return;stopAmbience();ambientScene=cat;
+  try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=playSound.ctx||(playSound.ctx=new AC());ambientMaster=ctx.createGain();ambientMaster.gain.value=.72;ambientMaster.connect(ctx.destination);ambientNodes.push(ambientMaster);
+    if(cat==='sea'){const n=ambientNoise(ctx,ambientMaster,{gain:.022,high:700});const l=ctx.createOscillator(),lg=ctx.createGain();l.frequency.value=.09;lg.gain.value=.013;l.connect(lg);lg.connect(n.g.gain);l.start();ambientNodes.push(l,lg);ambientTone(ctx,ambientMaster,55,.003);}
+    else if(cat==='shore'){const n=ambientNoise(ctx,ambientMaster,{gain:.028,high:950});const l=ctx.createOscillator(),lg=ctx.createGain();l.frequency.value=.16;lg.gain.value=.016;l.connect(lg);lg.connect(n.g.gain);l.start();ambientNodes.push(l,lg);}
+    else if(cat==='river'){ambientNoise(ctx,ambientMaster,{gain:.035,high:1800});ambientNoise(ctx,ambientMaster,{gain:.012,high:420,type:'lowpass'});}
+    else if(cat==='storm'){ambientNoise(ctx,ambientMaster,{gain:.05,high:1100});ambientTone(ctx,ambientMaster,43,.018);}
+    else if(cat==='marsh'){ambientNoise(ctx,ambientMaster,{gain:.013,high:1200});ambientTone(ctx,ambientMaster,86,.004);}
+    else if(cat==='forest'){ambientNoise(ctx,ambientMaster,{gain:.009,high:2200,type:'highpass'});ambientNoise(ctx,ambientMaster,{gain:.006,high:500});ambientTimer=setInterval(()=>birdChirp(ctx,ambientMaster),6500);setTimeout(()=>birdChirp(ctx,ambientMaster),800);}
+    else if(cat==='cave'){ambientNoise(ctx,ambientMaster,{gain:.007,high:500});ambientTone(ctx,ambientMaster,63,.006);ambientTone(ctx,ambientMaster,94,.003);}
+    else if(cat==='wind'){ambientNoise(ctx,ambientMaster,{gain:.025,high:800});ambientTone(ctx,ambientMaster,48,.004);}
+    else if(cat==='battle'){ambientNoise(ctx,ambientMaster,{gain:.02,high:700});ambientTone(ctx,ambientMaster,52,.008);}
+  }catch{}
+}
+
+
 function playSound(kind){
   if(!audioOn)return;
   try{
@@ -581,7 +686,7 @@ function showSceneReveal(scene){
   const sc=scenes[scene]; if(!sc||scene===lastSceneSeen)return; lastSceneSeen=scene;
   if(scene==='storm'||scene==='wave')playSound('storm'); else if(scene==='troll')playSound('troll');
   const overlay=$('sceneReveal'); if(!overlay)return;
-  overlay.style.backgroundImage=`linear-gradient(rgba(3,8,15,.2),rgba(3,8,15,.82)),url('${sceneImages[scene]||'assets/recap.jpg'}')`;
+  overlay.style.backgroundImage=`linear-gradient(rgba(3,8,15,.2),rgba(3,8,15,.82)),url('${sceneImages[scene]||'assets/black_home.jpg'}')`;
   $('revealKicker').textContent=scene==='troll'?'RANDOM EVENT':'THE BLACK SEAL';
   $('revealTitle').textContent=sc.title;
   $('revealText').textContent=scene==='troll'?'Something huge moves beneath the bridge.':scene==='storm'?'The calm is over. The sky breaks.':sc.mission;
@@ -605,6 +710,7 @@ function showConsequence(title,text,type='good'){
 function handleAtmosphere(oldS,newS){
   if(oldS.phase!=='playing'&&newS.phase==='playing')setTimeout(()=>showSceneReveal(newS.scene),120);
   else if(newS.phase==='playing'&&oldS.scene!==newS.scene){if(suppressNextSceneReveal)suppressNextSceneReveal=false;else setTimeout(()=>showSceneReveal(newS.scene),120);}
+  if(newS.phase==='playing'&&ambientOn)updateAmbience(newS.scene,oldS.scene!==newS.scene);
   if(oldS.supplies!==newS.supplies)showConsequence(newS.supplies>oldS.supplies?'Supplies gained':'Supplies lost',`${Math.abs(newS.supplies-oldS.supplies)} supply ${Math.abs(newS.supplies-oldS.supplies)===1?'point':'points'} ${newS.supplies>oldS.supplies?'added to':'removed from'} the expedition.`,newS.supplies>oldS.supplies?'good':'bad');
   else if((oldS.items||[]).length!==(newS.items||[]).length)showConsequence('Inventory updated','The party has gained or used a special item.','good');
   else if(oldS.hope!==newS.hope)showConsequence('Hope changes',`Party Hope is now ${newS.hope}/6.`,newS.hope>oldS.hope?'good':'bad');
@@ -637,6 +743,68 @@ function outcomeNarrative(payload){
   if(result==='DECISION MADE'){let d=String(payload.desc||'');if(/^do not wait\s*[—-]\s*/i.test(d))d=d.replace(/^do not wait\s*[—-]\s*/i,'press on without waiting and ');return d?`The company chose to ${esc(d)}.`:`The choice was made.`;}
   return action?`${hero} succeeded in ${action}.`:`${hero} succeeded.`;
 }
+
+function actionPast(desc=''){
+  const s=String(desc||'').trim();if(!s)return '';
+  const m=s.match(/^([A-Za-z]+)(.*)$/);if(!m)return s;
+  const v=m[1].toLowerCase(),rest=m[2]||'';
+  const irregular={be:'was able to',break:'broke',bring:'brought',build:'built',choose:'chose',come:'came',cut:'cut',dig:'dug',do:'did',drive:'drove',fight:'fought',find:'found',flee:'fled',get:'got',hold:'held',keep:'kept',lead:'led',leave:'left',make:'made',read:'read',ride:'rode',rise:'rose',run:'ran',see:'saw',send:'sent',stand:'stood',take:'took',wake:'woke',write:'wrote'};
+  let past=irregular[v];
+  if(!past){if(v.endsWith('e'))past=v+'d';else if(v.endsWith('y')&&!/[aeiou]y$/.test(v))past=v.slice(0,-1)+'ied';else past=v+'ed';}
+  return past+rest;
+}
+const destinationPhrases={arrival:'Greyhaven at festival dusk',ambush:'the North Gate under sudden attack',courier:'the sealed watch house at the gate',market_chase:'the crowded festival market',rooftops:'the red roofs above Lantern Ward',watch_house:'the Crown Watch post',lantern_cellar:'the hidden cellars of the Lantern Ward',guildhall:'the guild beneath the city',customs_archive:'the customs ledgers by the river',river_docks:'the foggy King’s River docks',warehouse:'the warehouse with no owner',masquerade:'Vane House at the masquerade',prince_attack:'the palace halls under attack',council:'the closed council beneath the chapel',old_tower:'the abandoned western watchtower',undercrypt:'the roads beneath the old city',gate_chamber:'the chamber of the Gate of Kings',betrayal:'the heart of the conspiracy',city_riot:'the streets of Greyhaven in revolt',west_gate:'the embattled West Gate',palace_siege:'the palace under siege',arsenal:'the royal arsenal in crisis',final_council:'the last council before dawn',gate_awakens:'the waking Gate of Kings',final_crisis:'the final struggle across Greyhaven',black_seal:'the last decision over the Black Seal'};
+function scenePlace(sceneId){
+  const sc=scenes[sceneId];
+  if(destinationPhrases[sceneId]) return destinationPhrases[sceneId];
+  if(!sc?.title) return 'the next stretch of the journey';
+  return /^(the|a|an)\s/i.test(sc.title) ? sc.title : `the ${sc.title}`;
+}
+function routeClause(desc=''){
+  const s=String(desc||'').toLowerCase();
+  if(!s) return '';
+  if(s.includes('road')) return ' along the road';
+  if(s.includes('forest')) return ' through the forest';
+  if(s.includes('ridge')) return ' along the ridge';
+  if(s.includes('river')) return ' along the river';
+  if(s.includes('bridge')) return ' over the bridge';
+  if(s.includes('ledge')) return ' along the ledge';
+  if(s.includes('causeway')) return ' by the causeway';
+  if(s.includes('marsh')) return ' through the marsh';
+  if(s.includes('stairs')) return ' by the stairs';
+  if(s.includes('tunnel')||s.includes('culvert')) return ' through the tunnel';
+  if(s.includes('gate')) return ' toward the gate';
+  if(s.includes('dock')||s.includes('wharf')) return ' toward the docks';
+  return '';
+}
+function groupLabel(payload){
+  return payload.hero ? `${payload.hero} and the company` : 'The company';
+}
+function transitionBridge(payload){
+  if(!payload?.nextScene) return null;
+  const from=scenePlace(payload.fromScene);
+  const to=scenePlace(payload.nextScene);
+  const route=routeClause(payload.desc||'');
+  const actor=groupLabel(payload);
+  if(payload.label==='SETBACK'){
+    const setback=payload.failureText || `${payload.hero||'The acting hero'} could not ${String(payload.desc||'complete the task')}.`;
+    return `${setback} From ${from}, the company is forced onward${route} toward ${to}.`;
+  }
+  if(payload.label==='PARTIAL SUCCESS'){
+    return `${actor} got the job done, but not cleanly. From ${from}, the company presses on${route} toward ${to}, carrying the cost of that result with them.`;
+  }
+  if(payload.label==='DISCOVERY'){
+    return `${actor} noticed something important. From ${from}, the company moves on${route} toward ${to} with a clearer sense of the way ahead.`;
+  }
+  if(payload.label==='NOTHING FOUND'){
+    return `Nothing useful revealed itself at ${from}, so the company keeps moving${route} toward ${to}.`;
+  }
+  if(payload.label==='DECISION MADE'){
+    return `The company ${actionPast(payload.desc||'chose the next path')}. From ${from}, they set out${route} toward ${to}.`;
+  }
+  const past=actionPast(payload.desc||'pressed on');
+  return `${payload.hero||'The company'} successfully ${past}. From ${from}, the company moves on${route} toward ${to}.`;
+}
 function renderOutcome(){
   const payload=activeOutcome;if(!payload)return;
   const result=payload.label||'OUTCOME';
@@ -648,6 +816,7 @@ function renderOutcome(){
   if(payload.complication)moments.push(`<div class="complication-callout">⚠️ <b>UNEXPECTED COMPLICATION</b> — ${esc(payload.complicationEffect||'Something else goes wrong despite the main action.')}</div>`);
   if(payload.successes!=null&&payload.teamSize)moments.push(`<div class="outcome-team-score"><b>${payload.successes}/${payload.teamSize}</b> team roles succeeded.</div>`);
   if(payload.partialEffect)moments.push(`<div class="outcome-team-score"><b>Cost:</b> ${esc(payload.partialEffect)}</div>`);
+  if(result==='SETBACK'&&payload.consequenceText)moments.push(`<div class="outcome-team-score setback-cost"><b>Consequence:</b> ${esc(payload.consequenceText)}</div>`);
   $('outcomeMoments').innerHTML=moments.join('');
   $('outcomeNext').innerHTML='';
   $('outcomeContinue').textContent='Continue';
@@ -657,7 +826,7 @@ function showOutcome(payload){
   suppressNextSceneReveal=true;activeOutcome=payload;renderOutcome();modal.classList.remove('hidden');playSound(payload.label==='SETBACK'?'fail':'success');
 }
 socket.on('outcome',showOutcome);
-if($('outcomeContinue'))$('outcomeContinue').onclick=()=>{if(!$('outcomeModal'))return;$('outcomeModal').classList.add('hidden');activeOutcome=null;};
+if($('outcomeContinue'))$('outcomeContinue').onclick=()=>{if(!$('outcomeModal'))return;const bridgeText=transitionBridge(activeOutcome);if(bridgeText&&activeOutcome?.nextScene)pendingStoryBridge={scene:activeOutcome.nextScene,text:bridgeText};$('outcomeModal').classList.add('hidden');activeOutcome=null;if(state?.phase==='playing')renderGame();};
 socket.on('skillPointEarned',x=>{playSound('success');showSpotlight('HERO ADVANCEMENT','Skill Point Earned','Open My Hero to choose one skill to improve. Your hero is becoming something more.',portraitPath(player()?.cls,player()?.portrait),2800);showConsequence('Skill Point earned!','Open My Hero to improve one skill.','good');if($('heroSheetModal')&&!$('heroSheetModal').classList.contains('hidden'))renderHeroSheet();});
 socket.on('talentEarned',x=>{playSound('success');showSpotlight('ADVANCED PATH UNLOCKED',x.talent,x.desc,portraitPath(player()?.cls,player()?.portrait),3200);showConsequence(`${x.talent} unlocked`,x.desc,'good');if(!$('heroSheetModal').classList.contains('hidden'))renderHeroSheet();});
 socket.on('itemFound',it=>{playSound('success');const modal=document.createElement('div');modal.className='item-modal';modal.innerHTML=`<div class="item-modal__card"><div style="font-size:3rem">${it.icon||'🎒'}</div><div class="eyebrow">ITEM DISCOVERED</div><h2>${esc(it.name)}</h2><p>${esc(it.desc||'')}</p><button class="btn btn-success full">Add to the Expedition</button></div>`;document.body.appendChild(modal);modal.querySelector('button').onclick=()=>modal.remove();});
