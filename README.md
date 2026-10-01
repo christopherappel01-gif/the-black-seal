@@ -1,48 +1,40 @@
-# The Lost Expedition — Expanded Journey Remake
+# The Black Seal — Expanded Greyhaven Remake
 
-A browser-based cooperative fantasy RPG for 1–6 players. This remake keeps the established dice, skills, Growth, Hope, Threat, save/return and class systems, but substantially changes the pace and structure of the campaign.
+A browser-based cooperative fantasy intrigue RPG for 1–6 players, built on the same mechanics as The Lost Expedition. The campaign is set in Greyhaven: a royal city of guilds, soldiers, spies, hidden passages and an old military secret beneath the streets.
 
 ## What is new in this remake
 
-- **Real route branches.** Several major choices now open 5–6 exclusive scenes before reconverging with the main story. The East River Road and Western Ridge, Moon Marsh and Old King’s Ridge, Sea Cliffs and Old Quarry, and High Pass and Deep Rootway are genuinely different journeys.
-- **Split parties.** At selected moments the company can divide into two groups. Each group receives its own scenes, challenges and turn opportunities while the global player order continues. When both groups reach the rendezvous, the engine reunites them automatically.
-- **Fog-of-war map.** The Journey panel is now a stylised map of Aranor. Explored regions emerge from the fog, dotted routes record where the company has travelled, and separated groups leave different trails.
-- **Sense Checks.** Optional low-stakes checks use relevant skills to notice shortcuts, clues, safe routes, supplies or context. Missing a Sense Check does not add Threat, wound a hero or give Growth.
-- **Longer travel.** Forests, marshes, ridge roads, cliffs and mountain routes now take several scenes. Travel can include camps, weather, route finding, observations and quiet choices rather than jumping directly between plot anchors.
-- **Multi-stage battles.** The White City siege now unfolds across several beats. The company can even split between the western wall and the burning lower ward before reuniting for the final approach.
-- **Party-size scaling.** Team challenges adapt to the number of heroes actually present in the current subgroup.
-- **Shared consequences, separate experiences.** Hope, Threat, Supplies and special items remain expedition-wide, but split groups can discover different information and take different paths.
+- **Real investigative branches.** The company can spend several scenes in the Lantern Ward or River Docks, take the public Court Wing or palace Service Passages, and approach Old Greyhaven through the Bell Quarter or Undercity.
+- **Split parties.** At major investigation and battle points the company can divide. Different heroes can follow separate story lines while the global turn order continues, then automatically reunite at a shared story anchor.
+- **Fog-of-war city map.** The Journey panel now behaves like an explored city map. Districts emerge from fog as they are visited, branch routes remain visible, and simultaneous groups leave separate trails.
+- **Sense Checks.** Optional low-stakes observations can reveal patrol routines, hidden doors, altered schedules, smuggling routes, shortcuts and useful evidence without making every moment a high-stakes challenge.
+- **City travel takes time.** Crossing Greyhaven now involves markets, gates, crowds, rooftops, workshops, aqueducts, archives and checkpoints rather than teleporting from one plot location to the next.
+- **Longer battle arcs.** The coup develops over several beats. The company can split between the West Gate and Royal Arsenal, fight separate mini-campaigns, then reunite before the final confrontation.
+- **Party-size scaling.** Team challenges adapt to the number of heroes in the current subgroup.
 
 ## Core rules retained
 
-- Six classes: Knight, Ranger, Thief, Mage, Monk and Engineer
-- Ten skills and 20 starting skill points
-- Relevant skills are restricted by the challenge
-- D6 checks with Advantage/Disadvantage at higher mastery or serious wounds
-- Heroic Moments on a 6 and Unexpected Complications on a 1
+- Knight, Ranger, Thief, Mage, Monk and Engineer
+- Ten-skill character system
+- Challenge-specific skill choices
+- D6, Advantage / Disadvantage, Heroic Moments and Unexpected Complications
 - Solo, Support and Team challenges
-- 5 Growth = 1 Skill Point
-- Heroic Intervention
-- Hope and Threat
-- Save, reconnect, Return PIN and campaign backup
-- Multiple endings based on discoveries, allies and choices
+- Growth, Skill Points and advanced talents
+- Hope, Threat and Supplies
+- Save / rejoin / Return PIN / campaign backup
+- Choice-dependent allies, evidence and endings
 
 ## Scale
 
-The campaign now contains roughly **120 scene definitions**. A single group will not see all of them: route choices and split-party sections deliberately create different versions of the journey.
+The campaign now contains roughly **116 scene definitions**, with many mutually exclusive route scenes. A normal playthrough sees only one part of the total campaign tree unless the party splits.
 
-- **Cinematic landing page.** The opening screen now uses a new full-height Aranor illustration and a simpler adventure-first presentation.
-- **Cleaner Sense Checks.** Sense Checks now focus on the target, relevant skill ratings, and what success or a miss means, without repeating general rules.
+- **Bespoke Greyhaven artwork.** The old Lost Expedition placeholder scenes have been replaced with city, docks, masquerade, undercity, siege and Gate-of-Kings artwork, plus dedicated recurring-character portraits.
+- **Cinematic landing page.** The home screen now uses a full-height Greyhaven illustration and a simpler, more atmospheric entry into the game.
+- **Cleaner Sense Checks.** Sense Checks now show only the target, relevant skill ratings, and what success or a miss means.
 
 ## Run / deploy
 
-Use the same Node / Express / Socket.IO deployment process as earlier versions. Upload the project contents to the existing GitHub repository and redeploy on Render, or run locally with `npm install` and `npm start`.
-
-## Voice chat & ambient audio update
-
-This build adds optional in-browser voice chat using WebRTC, with Socket.IO used only for signalling. Players can join/leave voice independently of game state, mute themselves, and see speaking indicators. Voice requires HTTPS and browser microphone permission. The default configuration uses public STUN servers; for the most reliable production use across restrictive networks, add a TURN service in a future deployment.
-
-The Lost Expedition also now has procedural ambient soundscapes that change with the story location: sea, storm, shoreline waves, river, marsh, forest, caves, mountain wind and battle atmosphere. Ambience has its own toggle and does not affect voice chat.
+Use the same Node / Express / Socket.IO process as the existing game. Upload the project to GitHub and redeploy on Render, or run locally with `npm install` and `npm start`.
 
 ## Dialogue & Memory Pass
 This build adds consequential NPC dialogue, hidden relationship state, a People/Clues/Decisions journal, combined clue conclusions, and knowledge-based difficulty adjustments. Successful questioning now produces actual answers; failed conversations can still reveal partial information or alter trust.

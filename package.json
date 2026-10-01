@@ -1,8 +1,8 @@
 {
-  "name": "lost-expedition-expanded",
-  "version": "4.0.0",
+  "name": "black-seal-rpg",
+  "version": "5.0.1",
   "private": true,
-  "description": "Expanded cooperative fantasy RPG with route arcs, split parties and fog-of-war exploration",
+  "description": "Greyhaven cooperative intrigue RPG with route arcs, split parties and fog-of-war city exploration",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
