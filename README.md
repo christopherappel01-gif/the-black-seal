@@ -35,3 +35,6 @@ The campaign now contains roughly **116 scene definitions**, with many mutually 
 ## Run / deploy
 
 Use the same Node / Express / Socket.IO process as the existing game. Upload the project to GitHub and redeploy on Render, or run locally with `npm install` and `npm start`.
+
+## Dialogue & Memory Pass
+This build adds consequential NPC dialogue, hidden relationship state, a People/Clues/Decisions journal, combined clue conclusions, and knowledge-based difficulty adjustments. Successful questioning now produces actual answers; failed conversations can still reveal partial information or alter trust.

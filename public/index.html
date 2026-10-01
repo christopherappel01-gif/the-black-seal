@@ -198,7 +198,7 @@
       <button class="btn btn-ghost btn-small menuBtn" type="button">← Main Menu</button>
       <div><div class="eyebrow">THE BLACK SEAL</div><h1 id="sceneTitle">Greyhaven</h1></div>
       <div class="game-status">
-        <div class="sound-row"><button id="heroSheetBtn" class="btn btn-secondary-accent btn-small" type="button">🧭 My Hero</button> <button id="soundToggle" class="btn btn-ghost btn-small" type="button">🔊 SFX on</button> <button id="ambientToggle" class="btn btn-ghost btn-small" type="button">🌿 Ambience on</button></div>
+        <div class="sound-row"><button id="heroSheetBtn" class="btn btn-secondary-accent btn-small" type="button">🧭 My Hero</button> <button id="journalBtn" class="btn btn-ghost btn-small" type="button">📖 Journal</button> <button id="soundToggle" class="btn btn-ghost btn-small" type="button">🔊 SFX on</button> <button id="ambientToggle" class="btn btn-ghost btn-small" type="button">🌿 Ambience on</button></div>
         <div class="room-mini">Room <strong id="gameRoom"></strong> · Your Return PIN <strong id="returnPinGame">----</strong></div>
         <div class="status-row"><span>Round <b id="round"></b></span><span>Hope <b id="hope"></b>/6</span><span>Threat <b id="threat"></b>/6</span></div>
       </div>
@@ -263,6 +263,8 @@
     <p id="revealText"></p>
   </div>
 </div>
+
+<div id="journalModal" class="hero-sheet-modal hidden" role="dialog" aria-modal="true" aria-labelledby="journalTitle"><div class="hero-sheet-card journal-card"><div class="hero-sheet-head"><div><div class="eyebrow">CAMPAIGN JOURNAL</div><h2 id="journalTitle">People, clues & decisions</h2></div><button id="journalClose" class="btn btn-ghost btn-small" type="button">Close</button></div><div id="journalBody"></div></div></div>
 <div id="outcomeModal" class="outcome-modal hidden" role="dialog" aria-modal="true" aria-labelledby="outcomeTitle">
   <div class="outcome-card">
     <div id="outcomeLabel" class="eyebrow">OUTCOME</div>
